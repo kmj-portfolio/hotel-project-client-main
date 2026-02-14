@@ -1,0 +1,58 @@
+@import 'tailwindcss';
+
+* {
+  /* DayPicker Button Color */
+  --rdp-accent-color: #4a6ca0;
+}
+
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 300;
+  font-display: swap;
+  src: url('./assets/fonts/Pretendard-Light.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 400;
+  font-display: swap;
+  src: url('./assets/fonts/Pretendard-Regular.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 500;
+  font-display: swap;
+  src: url('./assets/fonts/Pretendard-Medium.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 600;
+  font-display: swap;
+  src: url('./assets/fonts/Pretendard-Bold.woff2') format('woff2');
+}
+@theme {
+  --font-sans: Pretendard, sans-serif;
+  --color-primary-100: #e7eef6;
+  --color-primary-200: #c7d6eb;
+  --color-primary-300: #a3bce0;
+  --color-primary-400: #7897c2;
+  --color-primary-500: #4a6ca0;
+  --color-primary-600: #32518a;
+  --color-primary-700: #264176;
+  --color-primary-800: #1e345b;
+  --color-primary-900: #162944;
+
+  --color-black: #1a1a1a;
+
+  --color-gray-primary: #dadada;
+  --color-error: #e57373;
+}
+
+body {
+  min-height: 100vh;
+}
+
+.selected-range {
+  background-color: #2196f3;
+  color: white;
+}
