@@ -18,6 +18,32 @@ import type Response from '@/types/Responsne';
 const handleApiReqeust = async <T>(
   fetchApi: () => Promise<AxiosResponse<Response<T>>>,
 ): Promise<T> => {
+  const getErrorMessage = (errorResult: unknown) => {
+    if (typeof errorResult === 'string' && errorResult.trim()) {
+      return errorResult;
+    }
+
+    if (errorResult && typeof errorResult === 'object') {
+      const errorObject = errorResult as {
+        message?: unknown;
+        localizedMessage?: unknown;
+      };
+
+      if (typeof errorObject.message === 'string' && errorObject.message.trim()) {
+        return errorObject.message;
+      }
+
+      if (
+        typeof errorObject.localizedMessage === 'string' &&
+        errorObject.localizedMessage.trim()
+      ) {
+        return errorObject.localizedMessage;
+      }
+    }
+
+    return '요청을 정상적으로 처리하지 못했습니다.';
+  };
+
   try {
     const response = await fetchApi();
     //FIXME: 개발 완료 후 console 삭제
@@ -27,13 +53,13 @@ const handleApiReqeust = async <T>(
     }
 
     // resultCode != SUCCESS 일 시 모든 요청 throw
-    throw response.data.result;
+    throw getErrorMessage(response.data.result);
   } catch (error) {
     console.log('handlReqeustError', error);
     if (axios.isAxiosError<Response<T>>(error)) {
       if (error.response && error.response.data.resultCode === 'ERROR') {
         // 요청 에러
-        throw error.response.data.result || '요청을 정상적으로 처리하지 못했습니다.';
+        throw getErrorMessage(error.response.data.result);
       }
 
       if (error.status === 500 || error.status === 403) {
@@ -41,7 +67,7 @@ const handleApiReqeust = async <T>(
         throw '서버에서 오류가 발생했습니다.';
       }
 
-      throw error.response?.data.result;
+      throw getErrorMessage(error.response?.data.result);
     }
 
     // 기타 에러

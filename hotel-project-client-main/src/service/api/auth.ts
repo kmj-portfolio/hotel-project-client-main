@@ -9,9 +9,9 @@ type oAuthIdentity = 'kakao' | 'google';
 
 const getSignUpApiUrl = (role: UserRole) => {
   if (role === 'ROLE_CUSTOMER') {
-    return '/api/customers/sign-up';
+    return '/api/customers/signup';
   } else {
-    return '/api/providers/sign-up';
+    return '/api/providers/signup';
   }
 };
 
