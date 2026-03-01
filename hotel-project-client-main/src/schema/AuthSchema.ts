@@ -19,8 +19,8 @@ const RegisterBaseSchema = z.object({
 
   nickname: z
     .string({ message: '닉네임은 필수 입력입니다.' })
-    .min(2, { message: '닉네임은 두글자 이상이어야합니다.' })
-    .max(8, { message: '닉네임은 최대 8글자 입니다.' }),
+    .min(3, { message: '닉네임은 세글자 이상이어야합니다.' })
+    .max(16, { message: '닉네임은 최대 16글자 입니다.' }),
   birthdate: z
     .string({ message: '생년월일은 필수 입력입니다.' })
     .regex(birthdateRegex, '올바른 형식이 아닙니다.'),
