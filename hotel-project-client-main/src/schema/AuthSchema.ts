@@ -70,6 +70,35 @@ export const GeneralRegisterSchema = RegisterBaseSchema.extend({
   }
 });
 
+// 사업자 회원가입
+export const ProviderRegisterSchema = z
+  .object({
+    email: z
+      .string({ message: '이메일은 필수 입력입니다.' })
+      .email({ message: '잘못된 이메일 형식입니다.' }),
+    name: z.string({ message: '이름은 필수 입력입니다.' }),
+    password: z
+      .string({ message: '비밀번호는 필수 입력입니다.' })
+      .min(10, { message: '비밀번호는 최소 10자 이상이어야 합니다.' }),
+    passwordConfirm: z
+      .string({ message: '비밀번호 확인은 필수 입력입니다.' })
+      .min(10, { message: '비밀번호는 최소 10자 이상이어야 합니다.' }),
+  })
+  .superRefine((val, ctx) => {
+    if (val.password !== val.passwordConfirm) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: '비밀번호가 일치하지 않습니다.',
+        path: ['password'],
+      });
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: '비밀번호가 일치하지 않습니다.',
+        path: ['passwordConfirm'],
+      });
+    }
+  });
+
 export const ChangePasswordSchema = z
   .object({
     currentPassword: z.string().min(1, { message: '현재 비밀번호를 입력해주세요.' }),
@@ -94,3 +123,4 @@ export type RegisterBaseType = z.infer<typeof RegisterBaseSchema>;
 
 export type SocialRegisterType = z.infer<typeof SocialRegisterSchema>;
 export type GeneralRegisterType = z.infer<typeof GeneralRegisterSchema>;
+export type ProviderRegisterType = z.infer<typeof ProviderRegisterSchema>;

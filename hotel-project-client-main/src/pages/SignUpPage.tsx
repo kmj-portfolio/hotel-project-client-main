@@ -1,6 +1,5 @@
 import GeneralRegisterForm from '@/component/form/auth/GeneralRegisterForm';
-import type { GeneralRegisterType } from '@/schema/AuthSchema';
-// login API는 더 이상 여기서 호출하지 않으므로 임포트에서 제거
+import type { GeneralRegisterType, ProviderRegisterType } from '@/schema/AuthSchema';
 import { GeneralSignup } from '@/service/api/auth';
 import type { UserRole } from '@/types/user';
 import { useState } from 'react';
@@ -21,18 +20,12 @@ const SignUpPage = () => {
   const navigate = useNavigate();
   const [role, setRole] = useState<UserRole>('ROLE_CUSTOMER');
 
-  const handleSubmit = async (data: GeneralRegisterType) => {
+  const handleSubmit = async (data: GeneralRegisterType | ProviderRegisterType) => {
     try {
       const response = await GeneralSignup(role, data);
 
-      // 회원가입 성공 시 로직 변경
-      if (response.id) {
-        alert('회원가입이 완료되었습니다.'); // 성공 알림창 띄우기
-        navigate('/'); // 확인을 누르면 메인 페이지로 이동
-        return;
-      }
-
-      navigate('/login');
+      alert('회원가입이 완료되었습니다.');
+      navigate('/');
     } catch (error: unknown) {
       // React Error #31 방지: 에러 객체가 폼 컴포넌트로 넘어가지 않도록 문자열로 안전하게 변환
       if (typeof error === 'string') {
@@ -69,7 +62,7 @@ const SignUpPage = () => {
             사업자
           </button>
         </div>
-        <GeneralRegisterForm onSubmit={handleSubmit} />
+        <GeneralRegisterForm key={role} role={role} onSubmit={handleSubmit} />
       </div>
     </section>
   );
