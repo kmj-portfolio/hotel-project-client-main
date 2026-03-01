@@ -27,6 +27,11 @@ export interface LoginResponse {
   role: UserRole;
 }
 
+export interface ProviderProfile {
+  email: string;
+  hotelName: string;
+}
+
 export interface WarnResponse {
   code: string;
   data: string;

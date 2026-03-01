@@ -2,8 +2,8 @@ import client, { setAccessToken } from '@/service/instance/client';
 
 import handleApiReqeust from './handleApiReqeust';
 
-import type { UserRole, UserInfo, WarnResponse, UserStatus, LoginResponse, CustomerDetails } from '@/types/user';
-import type { GeneralRegisterType, LoginType, SocialRegisterType, ChangePasswordType } from '@/schema/AuthSchema';
+import type { UserRole, UserInfo, WarnResponse, UserStatus, LoginResponse, CustomerDetails, ProviderProfile } from '@/types/user';
+import type { GeneralRegisterType, ProviderRegisterType, LoginType, SocialRegisterType, ChangePasswordType } from '@/schema/AuthSchema';
 
 type oAuthIdentity = 'kakao' | 'google';
 
@@ -15,7 +15,7 @@ const getSignUpApiUrl = (role: UserRole) => {
   }
 };
 
-export const GeneralSignup = async (role: UserRole, data: GeneralRegisterType) => {
+export const GeneralSignup = async (role: UserRole, data: GeneralRegisterType | ProviderRegisterType) => {
   const response = await handleApiReqeust<UserInfo>(() => client.post(getSignUpApiUrl(role), data));
 
   return response;
@@ -43,6 +43,11 @@ export const getAuthStatus = async () => {
 
 export const getCustomerDetails = async () => {
   const response = await handleApiReqeust<CustomerDetails>(() => client.get('/api/customers/my'));
+  return response;
+};
+
+export const getProviderProfile = async () => {
+  const response = await handleApiReqeust<ProviderProfile>(() => client.get('/api/providers/profile'));
   return response;
 };
 
