@@ -2,8 +2,8 @@ import client, { setAccessToken } from '@/service/instance/client';
 
 import handleApiReqeust from './handleApiReqeust';
 
-import type { UserRole, UserInfo, WarnResponse, UserStatus, LoginResponse } from '@/types/user';
-import type { GeneralRegisterType, LoginType, SocialRegisterType } from '@/schema/AuthSchema';
+import type { UserRole, UserInfo, WarnResponse, UserStatus, LoginResponse, CustomerDetails } from '@/types/user';
+import type { GeneralRegisterType, LoginType, SocialRegisterType, ChangePasswordType } from '@/schema/AuthSchema';
 
 type oAuthIdentity = 'kakao' | 'google';
 
@@ -41,8 +41,19 @@ export const getAuthStatus = async () => {
   return response;
 };
 
+export const getCustomerDetails = async () => {
+  const response = await handleApiReqeust<CustomerDetails>(() => client.get('/api/customers/my'));
+  return response;
+};
+
+export const updatePassword = async (data: Omit<ChangePasswordType, 'newPasswordConfirm'>) => {
+  const response = await handleApiReqeust<string>(() => client.put('/api/auth/pw', data));
+  return response;
+};
+
 export const logout = async () => {
-  await handleApiReqeust<UserRole>(() => client.post('/api/users/logout'));
+  await handleApiReqeust<UserRole>(() => client.post('/api/auth/logout'));
+  setAccessToken(null);
 };
 
 export const oAuthLogin = async (identifier: oAuthIdentity, code: string) => {
