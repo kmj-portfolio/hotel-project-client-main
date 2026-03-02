@@ -1,16 +1,29 @@
-import type { Room } from '@/types/room/room';
+import type { RoomInfo } from '@/types/room/room';
 import HotelRoom from './HotelRoom';
 
-const HotelRooms = ({ rooms }: { rooms: Room[] }) => {
+const HotelRooms = ({ rooms }: { rooms: RoomInfo[] }) => {
+  if (!rooms.length) {
+    return (
+      <div>
+        <h2 className="mb-4 text-2xl font-bold text-gray-900">객실</h2>
+        <p className="text-gray-400">등록된 객실이 없습니다.</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-col gap-8">
-      {rooms.length &&
-        rooms.map((room, index) => (
-          <HotelRoom imgPosition={`${index % 2 == 0 ? 'left' : 'right'}`} room={room} />
+    <div>
+      <h2 className="mb-6 text-2xl font-bold text-gray-900">
+        객실{' '}
+        <span className="text-lg font-normal text-gray-400">({rooms.length}개)</span>
+      </h2>
+      <div className="flex flex-col gap-4">
+        {rooms.map((room) => (
+          <HotelRoom key={room.roomId} room={room} />
         ))}
+      </div>
     </div>
   );
-  return <HotelRoom imgPosition="right" room={rooms[0]} />;
 };
 
 export default HotelRooms;

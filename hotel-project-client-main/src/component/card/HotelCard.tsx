@@ -6,6 +6,7 @@ import { RatingStars } from './RatingStars';
 import { formatNumberWithComma } from '@/utils/format/formatUtil';
 
 interface HotelCardProps {
+  hotelId: number;
   starLevel: number;
   name: string;
   address: string;
@@ -26,6 +27,7 @@ const toProxiedUrl = (url?: string) => {
 };
 
 const HotelCard = ({
+  hotelId,
   starLevel,
   name,
   address,
@@ -38,7 +40,7 @@ const HotelCard = ({
   const imageUrl = toProxiedUrl(mainImageUrl);
 
   return (
-    <Link to="/">
+    <Link to={`/hotels/${hotelId}`}>
       <div
         aria-label={name}
         className="hover:border-primary-200 relative flex w-full gap-4 rounded-2xl border border-gray-200 p-4 transition-colors lg:max-w-[300px] lg:flex-col"
