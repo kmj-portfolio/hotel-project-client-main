@@ -12,6 +12,10 @@ interface useAuthInterface {
   providerHotelId: number | null;
   setProviderHotelId: (id: number | null) => void;
   setLogout: () => void;
+  _hasHydrated: boolean;
+  setHasHydrated: (state: boolean) => void;
+  isTokenRestored: boolean;
+  setTokenRestored: () => void;
 }
 
 const useAuthStore = create<useAuthInterface>()(
@@ -32,10 +36,23 @@ const useAuthStore = create<useAuthInterface>()(
       setLogout: () => {
         set({ role: null, nickName: null, providerHotelId: null });
       },
+      _hasHydrated: false,
+      setHasHydrated: (state) => set({ _hasHydrated: state }),
+      isTokenRestored: false,
+      setTokenRestored: () => set({ isTokenRestored: true }),
     }),
     {
       name: 'user-info',
       storage: createJSONStorage(() => localStorage),
+      // Only persist user data — runtime flags must not be saved to localStorage
+      partialize: (state) => ({
+        role: state.role,
+        nickName: state.nickName,
+        providerHotelId: state.providerHotelId,
+      }),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     },
   ),
 );
