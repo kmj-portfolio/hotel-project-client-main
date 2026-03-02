@@ -8,6 +8,15 @@ export interface HotelDetail {
   starLevel: number;
   rating: number;
   reviewCount: number;
+  mainPhotoUrl?: string;
+  additionalPhotoUrls?: string[];
+}
+
+export interface PhotoDetailResponse {
+  photoId: number;
+  displayType: string;
+  uploadedFileName: string;
+  savedFileName: string;
 }
 
 export interface Hotel {
