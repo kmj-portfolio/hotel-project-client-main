@@ -6,9 +6,11 @@ interface HotelRoomsProps {
   hotelId: number;
   hotelName: string;
   hotelAddress: string;
+  checkIn: string;
+  checkOut: string;
 }
 
-const HotelRooms = ({ rooms, hotelId, hotelName, hotelAddress }: HotelRoomsProps) => {
+const HotelRooms = ({ rooms, hotelId, hotelName, hotelAddress, checkIn, checkOut }: HotelRoomsProps) => {
   if (!rooms.length) {
     return (
       <div>
@@ -31,6 +33,8 @@ const HotelRooms = ({ rooms, hotelId, hotelName, hotelAddress }: HotelRoomsProps
             hotelId={hotelId}
             hotelName={hotelName}
             hotelAddress={hotelAddress}
+            checkIn={checkIn}
+            checkOut={checkOut}
           />
         ))}
       </div>

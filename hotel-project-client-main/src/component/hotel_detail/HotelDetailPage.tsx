@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 
 import HotelIntro from './HotelIntro';
 import HotelMapView from './HotelMapView';
@@ -16,6 +16,9 @@ import type { Review } from '@/types/review/review';
 const HotelDetailPage = () => {
   const { hotelId } = useParams();
   const id = Number(hotelId);
+  const { state } = useLocation();
+  const checkIn: string = state?.checkIn ?? '';
+  const checkOut: string = state?.checkOut ?? '';
 
   const [hotelDetail, setHotelDetail] = useState<HotelDetail>();
   const [rooms, setRooms] = useState<RoomInfo[]>([]);
@@ -59,6 +62,8 @@ const HotelDetailPage = () => {
           hotelId={hotelDetail.hotelId}
           hotelName={hotelDetail.name}
           hotelAddress={hotelDetail.address}
+          checkIn={checkIn}
+          checkOut={checkOut}
         />
       </section>
 

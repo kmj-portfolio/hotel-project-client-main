@@ -72,7 +72,13 @@ const SearchPage = () => {
         <ul className="flex flex-col gap-4 lg:grid lg:grid-cols-5">
           {searchResults.map((hotel) => (
             <li key={hotel.hotelId} className="w-full">
-              <HotelCard {...hotel} liked={true} handleChangeLike={() => {}} />
+              <HotelCard
+                {...hotel}
+                liked={true}
+                handleChangeLike={() => {}}
+                checkIn={checkInDate}
+                checkOut={checkOutDate}
+              />
             </li>
           ))}
         </ul>

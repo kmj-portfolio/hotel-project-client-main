@@ -9,6 +9,8 @@ interface HotelRoomProps {
   hotelId: number;
   hotelName: string;
   hotelAddress: string;
+  checkIn: string;
+  checkOut: string;
 }
 
 const toProxiedUrl = (url?: string) => {
@@ -20,7 +22,7 @@ const toProxiedUrl = (url?: string) => {
   }
 };
 
-const HotelRoom = ({ room, hotelId, hotelName, hotelAddress }: HotelRoomProps) => {
+const HotelRoom = ({ room, hotelId, hotelName, hotelAddress, checkIn, checkOut }: HotelRoomProps) => {
   const role = useAuthStore((s) => s.role);
   const setLoginModalOpen = useAuthStore((s) => s.setLoginModalOpen);
   const navigate = useNavigate();
@@ -32,7 +34,7 @@ const HotelRoom = ({ room, hotelId, hotelName, hotelAddress }: HotelRoomProps) =
       return;
     }
     navigate('/booking', {
-      state: { room, hotelId, hotelName, hotelAddress },
+      state: { room, hotelId, hotelName, hotelAddress, checkIn, checkOut },
     });
   };
 

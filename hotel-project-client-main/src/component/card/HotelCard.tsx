@@ -15,6 +15,8 @@ interface HotelCardProps {
   mainImageUrl?: string;
   liked: boolean;
   handleChangeLike: () => void;
+  checkIn?: string;
+  checkOut?: string;
 }
 
 const toProxiedUrl = (url?: string) => {
@@ -36,11 +38,13 @@ const HotelCard = ({
   mainImageUrl,
   liked,
   handleChangeLike,
+  checkIn,
+  checkOut,
 }: HotelCardProps) => {
   const imageUrl = toProxiedUrl(mainImageUrl);
 
   return (
-    <Link to={`/hotels/${hotelId}`}>
+    <Link to={`/hotels/${hotelId}`} state={{ checkIn, checkOut }}>
       <div
         aria-label={name}
         className="hover:border-primary-200 relative flex w-full gap-4 rounded-2xl border border-gray-200 p-4 transition-colors lg:max-w-[300px] lg:flex-col"
