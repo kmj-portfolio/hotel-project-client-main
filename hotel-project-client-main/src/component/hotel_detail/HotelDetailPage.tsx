@@ -54,7 +54,12 @@ const HotelDetailPage = () => {
       <HotelIntro hotelDetail={hotelDetail} />
 
       <section className="mt-12 border-t border-gray-200 pt-10">
-        <HotelRooms rooms={rooms} />
+        <HotelRooms
+          rooms={rooms}
+          hotelId={hotelDetail.hotelId}
+          hotelName={hotelDetail.name}
+          hotelAddress={hotelDetail.address}
+        />
       </section>
 
       <section className="mt-12 border-t border-gray-200 pt-10">

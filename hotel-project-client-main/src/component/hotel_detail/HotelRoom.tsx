@@ -1,6 +1,15 @@
+import { useNavigate } from 'react-router-dom';
+
 import type { RoomInfo } from '@/types/room/room';
 import { formatNumberWithComma } from '@/utils/format/formatUtil';
 import useAuthStore from '@/stores/useAuthStore';
+
+interface HotelRoomProps {
+  room: RoomInfo;
+  hotelId: number;
+  hotelName: string;
+  hotelAddress: string;
+}
 
 const toProxiedUrl = (url?: string) => {
   if (!url) return undefined;
@@ -11,9 +20,21 @@ const toProxiedUrl = (url?: string) => {
   }
 };
 
-const HotelRoom = ({ room }: { room: RoomInfo }) => {
+const HotelRoom = ({ room, hotelId, hotelName, hotelAddress }: HotelRoomProps) => {
   const role = useAuthStore((s) => s.role);
+  const setLoginModalOpen = useAuthStore((s) => s.setLoginModalOpen);
+  const navigate = useNavigate();
   const imageUrl = toProxiedUrl(room.mainImageUrl);
+
+  const handleBook = () => {
+    if (!role) {
+      setLoginModalOpen(true);
+      return;
+    }
+    navigate('/booking', {
+      state: { room, hotelId, hotelName, hotelAddress },
+    });
+  };
 
   return (
     <div className="flex h-[200px] overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md">
@@ -62,7 +83,10 @@ const HotelRoom = ({ room }: { room: RoomInfo }) => {
           <div className="mt-0.5 text-xs text-gray-400">1박 기준</div>
         </div>
         {role !== 'ROLE_PROVIDER' && (
-          <button className="w-full rounded-lg bg-primary-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-800 active:bg-primary-900">
+          <button
+            onClick={handleBook}
+            className="w-full rounded-lg bg-primary-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-800 active:bg-primary-900"
+          >
             예약하기
           </button>
         )}

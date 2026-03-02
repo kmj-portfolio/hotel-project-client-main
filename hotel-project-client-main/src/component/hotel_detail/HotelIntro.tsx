@@ -33,7 +33,7 @@ const HotelIntro = ({ hotelDetail }: { hotelDetail: HotelDetail }) => {
     <div>
       {/* ── Photo Gallery ── */}
       {mainImageUrl && (
-        <div className="flex h-[460px] gap-2 overflow-hidden rounded-2xl">
+        <div className="flex h-[300px] gap-2 overflow-hidden rounded-2xl">
           <div className={`overflow-hidden ${additionalUrls.length > 0 ? 'flex-[3]' : 'flex-1'}`}>
             <img
               src={mainImageUrl}

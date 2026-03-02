@@ -1,7 +1,14 @@
 import type { RoomInfo } from '@/types/room/room';
 import HotelRoom from './HotelRoom';
 
-const HotelRooms = ({ rooms }: { rooms: RoomInfo[] }) => {
+interface HotelRoomsProps {
+  rooms: RoomInfo[];
+  hotelId: number;
+  hotelName: string;
+  hotelAddress: string;
+}
+
+const HotelRooms = ({ rooms, hotelId, hotelName, hotelAddress }: HotelRoomsProps) => {
   if (!rooms.length) {
     return (
       <div>
@@ -14,12 +21,17 @@ const HotelRooms = ({ rooms }: { rooms: RoomInfo[] }) => {
   return (
     <div>
       <h2 className="mb-6 text-2xl font-bold text-gray-900">
-        객실{' '}
-        <span className="text-lg font-normal text-gray-400">({rooms.length}개)</span>
+        객실 <span className="text-lg font-normal text-gray-400">({rooms.length}개)</span>
       </h2>
       <div className="flex flex-col gap-4">
         {rooms.map((room) => (
-          <HotelRoom key={room.roomId} room={room} />
+          <HotelRoom
+            key={room.roomId}
+            room={room}
+            hotelId={hotelId}
+            hotelName={hotelName}
+            hotelAddress={hotelAddress}
+          />
         ))}
       </div>
     </div>
