@@ -8,6 +8,10 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./hotel-project-client-main
+
     steps:
       - name: 저장소 체크아웃
         uses: actions/checkout@v3
@@ -15,7 +19,7 @@ jobs:
       - name: Node.js 설정
         uses: actions/setup-node@v3
         with:
-          node-version: '22' # 로컬에서 사용하는 노드 버전에 맞추세요
+          node-version: '22'
 
       - name: 패키지 설치
         run: npm install
@@ -28,10 +32,10 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-northeast-2 # S3 버킷 리전
+          aws-region: ap-northeast-2
 
       - name: S3에 빌드 파일 업로드
         run: aws s3 sync dist/ s3://splitnstay-webpage.com --delete
 
-      - name: CloudFront 캐시 무효화 (새로운 코드가 즉시 반영되도록 함)
+      - name: CloudFront 캐시 무효화
         run: aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_ID }} --paths "/*"
