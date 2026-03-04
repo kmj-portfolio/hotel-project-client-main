@@ -40,15 +40,17 @@ const GeneralRegisterForm = ({ role, onSubmit }: GeneralRegisterFormProps) => {
   const schema = isProvider ? ProviderRegisterSchema : GeneralRegisterSchema;
   const fields = isProvider ? ProviderFields : CustomerFields;
 
-  const { control, handleSubmit, formState, setError } = useForm<GeneralRegisterType>({
-    resolver: zodResolver(schema),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { control, handleSubmit, formState, setError } = useForm<GeneralRegisterType, any, GeneralRegisterType>({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(schema) as any,
     mode: 'onSubmit',
   });
 
   // always call useController (hooks rule) but only render for customers
   const { field: birthField, fieldState } = useController({ name: 'birthdate', control });
 
-  const handleSubmitRegister = async (data: GeneralRegisterType | ProviderRegisterType) => {
+  const handleSubmitRegister = async (data: GeneralRegisterType) => {
     const error = await onSubmit(data);
     if (error) {
       setError('root', { message: error });

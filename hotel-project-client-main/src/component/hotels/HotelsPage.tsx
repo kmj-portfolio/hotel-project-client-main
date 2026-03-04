@@ -12,7 +12,6 @@ const HotelsPage = () => {
   const hotelStore = useHotelStore();
   const navigationType = useNavigationType();
 
-  const [position, setPosition] = useState<{ lat: number; lng: number } | null>(null);
   const [option, setOption] = useState<string>('이름 순');
 
   // 각 정렬 옵션별 훅
@@ -50,11 +49,7 @@ const HotelsPage = () => {
     }
     // 위치 정보 가져오기
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
-        setPosition({ lat, lng });
-      },
+      () => {},
       (err) => {
         console.error('위치 정보 가져오기 실패:', err);
       },
