@@ -1,6 +1,7 @@
 export const profileMenuItems = [
   { label: '예약 내역', href: '/mypage/bookings' },
   { label: '결제 내역', href: '/mypage/payments' },
+  { label: '좋아요 목록', href: '/mypage/like' },
   { label: '개인 설정', href: '/mypage/settings' },
   { label: '고객센터', href: '/mypage/support' },
 ];

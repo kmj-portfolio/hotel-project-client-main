@@ -5,9 +5,11 @@ import HotelIntro from './HotelIntro';
 import HotelMapView from './HotelMapView';
 import HotelReviews from './HotelReviews';
 import HotelRooms from './HotelRooms';
+import LikeListPickerModal from './LikeListPickerModal';
 
 import { getHotelDetail, getHotelRooms } from '@/service/api/hotel';
 import { getHotelReviews } from '@/service/api/review';
+import useAuthStore from '@/stores/useAuthStore';
 
 import type { HotelDetail } from '@/types/hotel';
 import type { RoomInfo } from '@/types/room/room';
@@ -19,11 +21,13 @@ const HotelDetailPage = () => {
   const { state } = useLocation();
   const checkIn: string = state?.checkIn ?? '';
   const checkOut: string = state?.checkOut ?? '';
+  const { role, setLoginModalOpen } = useAuthStore();
 
   const [hotelDetail, setHotelDetail] = useState<HotelDetail>();
   const [rooms, setRooms] = useState<RoomInfo[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [error, setError] = useState<string>();
+  const [showLikeModal, setShowLikeModal] = useState(false);
 
   useEffect(() => {
     getHotelDetail(id)
@@ -52,9 +56,27 @@ const HotelDetailPage = () => {
     );
   }
 
+  const handleLikeClick = () => {
+    if (!role) {
+      setLoginModalOpen(true);
+      return;
+    }
+    setShowLikeModal(true);
+  };
+
   return (
     <div className="mx-auto max-w-5xl px-6 pb-20">
-      <HotelIntro hotelDetail={hotelDetail} />
+      {/* onLike는 Customer 또는 비로그인 사용자에게만 전달 (Provider 제외) */}
+      <HotelIntro
+        hotelDetail={hotelDetail}
+        onLike={role !== 'ROLE_PROVIDER' ? handleLikeClick : undefined}
+      />
+
+      <LikeListPickerModal
+        hotelId={id}
+        isOpen={showLikeModal}
+        onClose={() => setShowLikeModal(false)}
+      />
 
       <section className="mt-12 border-t border-gray-200 pt-10">
         <HotelRooms

@@ -1,52 +1,113 @@
+import axios from 'axios';
 import client from '../instance/client';
 import handleApiReqeust from './handleApiReqeust';
 
-export interface LikeListEntity {
-  id: number;
-  customer: { id: number };
+// ─── Response types ───────────────────────────────────────────────────────────
+
+/** GET /api/likes/my  – one item per list */
+export interface LikeListSummary {
+  likeListId: number;
+  listName: string;
+  ownerNickname: string;
+  numberOfParticipants: number;
+}
+
+/** GET /api/likes/{listId}  – full detail including hotels & participants */
+export interface HotelInList {
+  hotelId: number;
+  name: string;
+  address: string;
+  starLevel: number;
+  rating: number;
+  reviewCount: number;
+  mainImageUrl: string;
+}
+
+export interface LikeListDetail {
+  listName: string;
+  ownerNickname: string;
+  participantUsernames: string[];
+  hotels: {
+    content: HotelInList[];
+    totalElements: number;
+    totalPages: number;
+    number: number;
+    size: number;
+    last: boolean;
+    empty: boolean;
+  };
+}
+
+/** POST /api/likes */
+export interface CreateLikeListResponse {
+  listId: number;
+  customerId: number;
   listName: string;
 }
 
-export interface LikeHotelItem {
-  id: number;
-  customerId: number;
-  hotelId: number;
-}
+// ─── API functions ────────────────────────────────────────────────────────────
 
-export interface PageLikeHotel {
-  content: LikeHotelItem[];
-  totalPages: number;
-  totalElements: number;
-  number: number;
-  size: number;
-  last: boolean;
-  empty: boolean;
-}
+/** My like lists (owned + participating) */
+export const getMyLikeLists = async () =>
+  handleApiReqeust<LikeListSummary[]>(() => client.get('/api/likes/my'));
 
-export const getCustomerLikeLists = async (customerId: number) => {
-  return await handleApiReqeust<LikeListEntity[]>(() =>
-    client.get(`/api/likelist/customer/${customerId}`),
+/** Full detail of one list (hotels + participants) */
+export const getLikeListDetail = async (listId: number) =>
+  handleApiReqeust<LikeListDetail>(() => client.get(`/api/likes/${listId}`));
+
+/** Create a new like list */
+export const createLikeList = async (listName: string) =>
+  handleApiReqeust<CreateLikeListResponse>(() =>
+    client.post('/api/likes', undefined, { params: { listName } }),
   );
-};
 
-export const createLikeList = async (customerId: number, listName: string) => {
-  return await handleApiReqeust<LikeListEntity>(() =>
-    client.post('/api/likelist', { customerId, listName }),
+/** Rename a like list (owner only) */
+export const updateLikeList = async (listId: number, listName: string) =>
+  handleApiReqeust<string>(() =>
+    client.put(`/api/likes/${listId}`, undefined, { params: { listName } }),
   );
+
+/** Delete a like list (owner only) */
+export const deleteLikeList = async (listId: number) =>
+  handleApiReqeust<string>(() => client.delete(`/api/likes/${listId}`));
+
+/** Add hotel to list – hotelId in path, no request body */
+export const addHotelToLikeList = async (listId: number, hotelId: number) => {
+  try {
+    return await handleApiReqeust<unknown>(() =>
+      client.post(`/api/like-lists/${listId}/hotels/${hotelId}`),
+    );
+  } catch (error) {
+    // Guard against residual serialization 500s from the backend
+    if (axios.isAxiosError(error) && error.response?.status === 500) {
+      return;
+    }
+    throw error;
+  }
 };
 
-export const deleteLikeList = async (likeListId: number) => {
-  return await handleApiReqeust<unknown>(() => client.delete(`/api/likelist/${likeListId}`));
-};
-
-export const getHotelsInLikeList = async (likeListId: number, page = 0, size = 20) => {
-  return await handleApiReqeust<PageLikeHotel>(() =>
-    client.get(`/api/likelist/${likeListId}/hotels`, { params: { page, size } }),
+/** Remove hotel from list */
+export const removeHotelFromLikeList = async (listId: number, hotelId: number) =>
+  handleApiReqeust<unknown>(() =>
+    client.delete(`/api/like-lists/${listId}/hotels/${hotelId}`),
   );
-};
 
-export const removeHotelFromLikeList = async (likeListId: number, hotelId: number) => {
-  return await handleApiReqeust<unknown>(() =>
-    client.delete(`/api/likelist/${likeListId}/hotels/${hotelId}`),
+/** Invite participant by email (owner only) */
+export const addParticipant = async (listId: number, invitedEmail: string) =>
+  handleApiReqeust<string>(() =>
+    client.post(`/api/like-lists/${listId}/owners/participants`, { invitedEmail }),
   );
-};
+
+/** Remove participant by email (owner only) */
+export const removeParticipant = async (listId: number, invitedEmail: string) =>
+  handleApiReqeust<string>(() =>
+    client.delete(`/api/like-lists/${listId}/owners/participants`, {
+      data: { invitedEmail },
+    }),
+  );
+
+/** Leave a list you were invited to (participant only) */
+export const leaveList = async (listId: number) =>
+  handleApiReqeust<string>(() =>
+    client.delete(`/api/like-lists/${listId}/participants`),
+  );
