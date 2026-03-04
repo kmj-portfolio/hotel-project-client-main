@@ -35,7 +35,7 @@ const ReservationPage = () => {
       setReservations(response);
     };
     fetchData();
-  }, [activeTab]);
+  }, [activeTab, setReservations]);
 
   return (
     <>

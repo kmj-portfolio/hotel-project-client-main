@@ -9,7 +9,7 @@ const PaymentCard = () => {
   const { getReservationById } = useReservationStore();
   const reservations = getReservationById(reservationId);
 
-  const targetRoom = reservations?.rooms.find((room: ReservationRoom) => room.roomId === roomId);
+  const targetRoom = reservations?.rooms?.find((room: ReservationRoom) => room.roomId === roomId);
   const paymentData = payments && reservations && targetRoom;
 
   return (
@@ -45,7 +45,7 @@ const PaymentCard = () => {
           <div className="space-y-3 bg-gray-100 p-4">
             <ul className="space-y-3">
               <div className="flex justify-between text-sm text-gray-700">
-                <span>투숙객 x {reservations.rooms[0].participantCount}</span>
+                <span>투숙객 x {reservations.rooms?.[0]?.participantCount ?? reservations.numberOfParticipants}</span>
                 <span>
                   {formatNumberToWon(targetRoom.subtotalPrice * targetRoom.participantCount)}
                 </span>

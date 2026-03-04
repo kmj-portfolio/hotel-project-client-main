@@ -64,8 +64,7 @@ const HotelsPage = () => {
         maximumAge: 0,
       },
     );
-    //FIX ME: position은 언제 쓰는지, 쓴다면 사용되는 로직 삽입 후 아래의 로그 제거
-    console.log(position);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -94,6 +93,7 @@ const HotelsPage = () => {
     if (current.hotelList.length === 0) {
       triggerHotelLoad();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [option]);
 
   const { hotelList, handleAddHotelsToList } = getCurrentHotels();

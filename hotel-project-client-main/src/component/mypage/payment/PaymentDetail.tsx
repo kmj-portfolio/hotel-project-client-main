@@ -15,7 +15,7 @@ const PaymentDetail = () => {
       setReservations(response);
     };
     fetchData();
-  }, []);
+  }, [setReservations]);
 
   return (
     <div className="inset-0 z-50" onClick={togglePayment}>

@@ -40,7 +40,7 @@ const GeneralRegisterForm = ({ role, onSubmit }: GeneralRegisterFormProps) => {
   const schema = isProvider ? ProviderRegisterSchema : GeneralRegisterSchema;
   const fields = isProvider ? ProviderFields : CustomerFields;
 
-  const { control, handleSubmit, formState, setError } = useForm({
+  const { control, handleSubmit, formState, setError } = useForm<GeneralRegisterType>({
     resolver: zodResolver(schema),
     mode: 'onSubmit',
   });

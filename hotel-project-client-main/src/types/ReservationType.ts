@@ -9,6 +9,12 @@ export type ReservationStatus =
 // API Response 인터페이스 (ReservationListResponse)
 // =========================================
 
+export interface ReservationRoom {
+  roomId: number;
+  participantCount: number;
+  subtotalPrice: number;
+}
+
 export interface Reservation {
   reservationId: number;
   reservationNumber: string;
@@ -20,6 +26,7 @@ export interface Reservation {
   totalPrice: number;
   reservationStatus: ReservationStatus;
   numberOfParticipants: number;
+  rooms?: ReservationRoom[];
 }
 
 export interface PageInfo {

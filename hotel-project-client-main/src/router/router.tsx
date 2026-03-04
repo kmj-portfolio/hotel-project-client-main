@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { createBrowserRouter } from 'react-router-dom';
 
 import Provider from '@/provider/Provider';
 import Layout from '@/layout/Layout';
@@ -20,12 +20,7 @@ import LikePage from '@/component/mypage/like/LikePage';
 import ReviewsPage from '@/component/mypage/review/ReviewsPage';
 import HotelManagePage from '@/component/mypage/hotel/HotelManagePage';
 import BookingPage from '@/component/booking/BookingPage';
-import useAuthStore from '@/stores/useAuthStore';
-
-const MypageIndex = () => {
-  const { role } = useAuthStore();
-  return <Navigate to={role === 'ROLE_PROVIDER' ? '/mypage/hotel' : '/mypage/bookings'} replace />;
-};
+import MypageIndex from './MypageIndex';
 
 export const router = createBrowserRouter([
   {

@@ -22,7 +22,7 @@ const SignUpPage = () => {
 
   const handleSubmit = async (data: GeneralRegisterType | ProviderRegisterType) => {
     try {
-      const response = await GeneralSignup(role, data);
+      await GeneralSignup(role, data);
 
       alert('회원가입이 완료되었습니다.');
       navigate('/');
