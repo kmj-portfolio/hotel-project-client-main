@@ -24,6 +24,10 @@ jobs:
       - name: 패키지 설치
         run: npm install
 
+      - name: .env 파일 생성
+        run: |
+          echo "${{ secrets.ENV_PRODUCTION }}" > .env
+
       - name: Vite 프로젝트 빌드 (dist 폴더 생성)
         run: npm run build
 
