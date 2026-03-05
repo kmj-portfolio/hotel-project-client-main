@@ -55,7 +55,6 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     restoreAccessToken();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -66,7 +65,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Don't check auth status while token restoration is still in progress
     if (!isTokenRestored) return;
     handleCheckLoggedIn();
-  }, [location.pathname]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [location.pathname]);
 
   return <>{children}</>;
 };

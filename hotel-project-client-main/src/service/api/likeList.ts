@@ -1,4 +1,3 @@
-import axios from 'axios';
 import client from '../instance/client';
 import handleApiReqeust from './handleApiReqeust';
 
