@@ -60,12 +60,16 @@ const SearchPage = () => {
           <p className="text-lg font-medium text-gray-500">검색 결과가 없습니다</p>
           <p className="mt-1 text-sm">
             {location ? (
-              <><span className="font-semibold text-gray-600">"{location}"</span> 지역에 해당하는 호텔을 찾지 못했습니다.</>
+              <><span className="font-semibold text-gray-600">"{location}"</span> 주변 5km 이내에 호텔을 찾지 못했습니다.</>
             ) : (
               '다른 지역이나 날짜로 다시 검색해보세요.'
             )}
           </p>
-          <p className="mt-1 text-sm">다른 지역이나 날짜로 다시 검색해보세요.</p>
+          <p className="mt-3 max-w-sm rounded-lg bg-blue-50 px-4 py-3 text-center text-sm text-blue-700">
+            💡 <span className="font-medium">넓은 지역명(시·도)으로 검색하면 결과가 없을 수 있어요.</span>
+            <br />구·동 단위로 더 좁혀서 검색해보세요.
+            <br /><span className="text-blue-500">예: "서귀포시" → "서귀포시 중문동"</span>
+          </p>
         </div>
       )}
       {!isLoading && searchResults.length > 0 && (
