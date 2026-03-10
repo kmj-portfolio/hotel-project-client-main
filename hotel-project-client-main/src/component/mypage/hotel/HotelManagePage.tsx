@@ -238,7 +238,7 @@ const RoomPhotoModal = ({ room, onClose, onUpdate }: RoomPhotoModalProps) => {
     setError('');
     try {
       const result = await uploadRoomPhoto(room.roomId, file, 'MAIN');
-      const newUrl = `/api/photos/${result.savedFileName}`;
+      const newUrl = toProxiedUrl(result.photoUrl) ?? result.photoUrl;
       setMainUrl(newUrl);
       onUpdate({ mainImageUrl: newUrl });
     } catch (err) {
@@ -274,7 +274,7 @@ const RoomPhotoModal = ({ room, onClose, onUpdate }: RoomPhotoModalProps) => {
     try {
       const displayTypes = files.map(() => 'ADDITIONAL' as const);
       const results = await uploadRoomPhotos(room.roomId, files, displayTypes);
-      const newUrls = results.map((r) => `/api/photos/${r.savedFileName}`);
+      const newUrls = results.map((r) => toProxiedUrl(r.photoUrl) ?? r.photoUrl);
       const updated = [...additionalUrls, ...newUrls];
       setAdditionalUrls(updated);
       onUpdate({ additionalPhotoUrls: updated });

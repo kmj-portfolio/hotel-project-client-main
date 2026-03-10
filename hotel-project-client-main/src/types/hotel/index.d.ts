@@ -16,7 +16,7 @@ export interface PhotoDetailResponse {
   photoId: number;
   displayType: string;
   uploadedFileName: string;
-  savedFileName: string;
+  photoUrl: string;
 }
 
 export interface Hotel {
