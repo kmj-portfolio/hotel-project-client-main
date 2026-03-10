@@ -5,6 +5,7 @@ import { type Control, type Path, type FieldValues, useController } from 'react-
 import useDebounce from '@/hooks/useDebounce';
 
 import getAddressByCoords from '@/service/api/geocorder/getAddressByCoords';
+import getCoordsByAddress from '@/service/api/geocorder/getCoordsByAddress';
 
 import autoComplete from '@/utils/autoComplete';
 
@@ -52,6 +53,12 @@ const LocationInput = <T extends FieldValues>({ name, control }: LocationInputPr
     setAutoCompleteResults(autoComplete(regions, debouncedValue, 10));
   }, [debouncedValue, regions]);
 
+  useEffect(() => {
+    // 입력값이 확정되면 미리 지오코딩하여 캐시 워밍
+    if (!debouncedValue || debouncedValue.length < 2) return;
+    getCoordsByAddress(debouncedValue).catch(() => {});
+  }, [debouncedValue]);
+
   const handleGetCoords = async () => {
     // 좌표 -> 주소 변환 로직
     navigator.geolocation.getCurrentPosition(async (position) => {
@@ -88,6 +95,11 @@ const LocationInput = <T extends FieldValues>({ name, control }: LocationInputPr
                 onChange={onChange}
                 placeholder="지역을 검색하세요"
               />
+              <p className="mt-2 rounded-lg bg-blue-50 px-3 py-2 text-sm text-blue-600">
+                <span className="font-medium">시·도 단위보다 구·동 단위로 검색하면 더 정확합니다.</span>
+                <br />예) "서울시" → "서울시 마포구"
+                <br />    "서귀포시" → "서귀포시 중문동"
+              </p>
               <button
                 aria-label="내 위치"
                 onClick={handleGetCoords}
