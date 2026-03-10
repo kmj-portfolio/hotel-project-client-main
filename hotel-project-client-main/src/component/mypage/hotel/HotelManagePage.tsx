@@ -53,16 +53,6 @@ type RoomFormData = z.infer<typeof RoomSchema>;
 
 /* ── Helpers ─────────────────────────────────────────────────── */
 
-/** Backend returns absolute URLs (http://localhost:8080/...). Strip the host so
- *  the request goes through the Vite proxy instead of hitting port 8080 directly. */
-const toProxiedUrl = (url?: string) => {
-  if (!url) return undefined;
-  try {
-    return new URL(url).pathname;
-  } catch {
-    return url;
-  }
-};
 
 /* ── Sub-component: Address Type Toggle ─────────────────────── */
 
@@ -224,10 +214,8 @@ interface RoomPhotoModalProps {
 const RoomPhotoModal = ({ room, onClose, onUpdate }: RoomPhotoModalProps) => {
   const mainInputRef = useRef<HTMLInputElement>(null);
   const additionalInputRef = useRef<HTMLInputElement>(null);
-  const [mainUrl, setMainUrl] = useState<string | undefined>(toProxiedUrl(room.mainImageUrl));
-  const [additionalUrls, setAdditionalUrls] = useState<string[]>(
-    (room.additionalPhotoUrls ?? []).map((url) => toProxiedUrl(url) ?? url),
-  );
+  const [mainUrl, setMainUrl] = useState<string | undefined>(room.mainImageUrl);
+  const [additionalUrls, setAdditionalUrls] = useState<string[]>(room.additionalPhotoUrls ?? []);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
 
@@ -238,7 +226,7 @@ const RoomPhotoModal = ({ room, onClose, onUpdate }: RoomPhotoModalProps) => {
     setError('');
     try {
       const result = await uploadRoomPhoto(room.roomId, file, 'MAIN');
-      const newUrl = toProxiedUrl(result.photoUrl) ?? result.photoUrl;
+      const newUrl = result.photoUrl;
       setMainUrl(newUrl);
       onUpdate({ mainImageUrl: newUrl });
     } catch (err) {
@@ -274,7 +262,7 @@ const RoomPhotoModal = ({ room, onClose, onUpdate }: RoomPhotoModalProps) => {
     try {
       const displayTypes = files.map(() => 'ADDITIONAL' as const);
       const results = await uploadRoomPhotos(room.roomId, files, displayTypes);
-      const newUrls = results.map((r) => toProxiedUrl(r.photoUrl) ?? r.photoUrl);
+      const newUrls = results.map((r) => r.photoUrl);
       const updated = [...additionalUrls, ...newUrls];
       setAdditionalUrls(updated);
       onUpdate({ additionalPhotoUrls: updated });
@@ -420,7 +408,7 @@ const RoomCard = ({ room, onEdit, onDelete, onManagePhotos }: RoomCardProps) => 
       <div className="flex-1">
         {room.mainImageUrl && (
           <img
-            src={toProxiedUrl(room.mainImageUrl)}
+            src={room.mainImageUrl}
             alt={room.roomType}
             className="mb-3 h-32 w-full rounded-lg object-cover"
           />
@@ -777,7 +765,7 @@ const HotelManagePage = () => {
               <p className="mb-4 text-sm text-red-500">{editFormState.errors.root.message}</p>
             )}
             <form onSubmit={handleEditSubmit(onUpdateHotel)} className="space-y-4">
-              <HotelPhotoInput currentPhotoUrl={toProxiedUrl(hotel.mainPhotoUrl)} onChange={setSelectedPhoto} />
+              <HotelPhotoInput currentPhotoUrl={hotel.mainPhotoUrl} onChange={setSelectedPhoto} />
               <RHFInput name="name" label="호텔명" control={editControl} />
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
@@ -804,7 +792,7 @@ const HotelManagePage = () => {
           <div className="space-y-6">
             <div className="overflow-hidden rounded-xl bg-gray-100">
               {hotel.mainPhotoUrl ? (
-                <img src={toProxiedUrl(hotel.mainPhotoUrl)} alt="호텔 대표 사진" className="h-48 w-full object-cover" />
+                <img src={hotel.mainPhotoUrl} alt="호텔 대표 사진" className="h-48 w-full object-cover" />
               ) : (
                 <div className="flex h-48 items-center justify-center">
                   <Building2 className="h-14 w-14 text-gray-300" />

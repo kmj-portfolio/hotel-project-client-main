@@ -36,15 +36,6 @@ declare global {
   }
 }
 
-const toProxiedUrl = (url?: string) => {
-  if (!url) return undefined;
-  try {
-    return new URL(url).pathname;
-  } catch {
-    return url;
-  }
-};
-
 const today = formatDateToISOstring(new Date());
 
 const BookingPage = () => {
@@ -161,7 +152,7 @@ const BookingPage = () => {
   }
 
   const { room, hotelId, hotelName, hotelAddress } = state;
-  const imageUrl = toProxiedUrl(room.mainImageUrl);
+  const imageUrl = room.mainImageUrl;
 
   const nights =
     checkIn && checkOut

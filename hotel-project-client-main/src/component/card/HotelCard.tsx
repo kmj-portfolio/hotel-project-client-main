@@ -19,15 +19,6 @@ interface HotelCardProps {
   checkOut?: string;
 }
 
-const toProxiedUrl = (url?: string) => {
-  if (!url) return undefined;
-  try {
-    return new URL(url).pathname;
-  } catch {
-    return url;
-  }
-};
-
 const HotelCard = ({
   hotelId,
   starLevel,
@@ -41,7 +32,7 @@ const HotelCard = ({
   checkIn,
   checkOut,
 }: HotelCardProps) => {
-  const imageUrl = toProxiedUrl(mainImageUrl);
+  const imageUrl = mainImageUrl;
 
   return (
     <Link to={`/hotels/${hotelId}`} state={{ checkIn, checkOut }}>

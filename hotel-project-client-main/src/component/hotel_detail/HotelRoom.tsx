@@ -13,20 +13,11 @@ interface HotelRoomProps {
   checkOut: string;
 }
 
-const toProxiedUrl = (url?: string) => {
-  if (!url) return undefined;
-  try {
-    return new URL(url).pathname;
-  } catch {
-    return url;
-  }
-};
-
 const HotelRoom = ({ room, hotelId, hotelName, hotelAddress, checkIn, checkOut }: HotelRoomProps) => {
   const role = useAuthStore((s) => s.role);
   const setLoginModalOpen = useAuthStore((s) => s.setLoginModalOpen);
   const navigate = useNavigate();
-  const imageUrl = toProxiedUrl(room.mainImageUrl);
+  const imageUrl = room.mainImageUrl;
 
   const handleBook = () => {
     if (!role) {

@@ -4,15 +4,6 @@ import type { HotelDetail } from '@/types/hotel';
 import getStarRating from '@/utils/rating/getStarRating';
 import { Heart } from 'lucide-react';
 
-const toProxiedUrl = (url?: string) => {
-  if (!url) return undefined;
-  try {
-    return new URL(url).pathname;
-  } catch {
-    return url;
-  }
-};
-
 const ratingLabel = (rating: number) => {
   if (rating >= 4.5) return '최고';
   if (rating >= 4.0) return '매우 좋음';
@@ -28,11 +19,8 @@ const HotelIntro = ({
   hotelDetail: HotelDetail;
   onLike?: () => void;
 }) => {
-  const mainImageUrl = toProxiedUrl(hotelDetail.mainPhotoUrl);
-  const additionalUrls = (hotelDetail.additionalPhotoUrls ?? [])
-    .slice(0, 2)
-    .map(toProxiedUrl)
-    .filter(Boolean) as string[];
+  const mainImageUrl = hotelDetail.mainPhotoUrl;
+  const additionalUrls = (hotelDetail.additionalPhotoUrls ?? []).slice(0, 2);
 
   const [fullStars, hasHalfStar] = getStarRating(hotelDetail.starLevel);
 
