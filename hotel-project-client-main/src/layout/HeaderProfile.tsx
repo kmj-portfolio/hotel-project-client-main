@@ -10,7 +10,7 @@ const HeaderProfile = () => {
   const [profileMenuOpen, setProfileMenuOpen] = useState<boolean>(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
 
-  const { setLogout, role } = useAuthStore();
+  const { setLogout, role, nickName } = useAuthStore();
   const menuItems = role === 'ROLE_PROVIDER' ? providerProfileMenuItems : profileMenuItems;
 
   const navigate = useNavigate();
@@ -53,6 +53,9 @@ const HeaderProfile = () => {
         <div className="h-10 w-10 overflow-hidden rounded-full border-2 border-gray-200">
           <img src={ProfileImage} alt="프로필" className="h-full w-full object-cover" />
         </div>
+        {nickName && (
+          <span className="hidden text-sm font-medium text-gray-700 md:block">{nickName}</span>
+        )}
         <ChevronDown
           className={`h-4 w-4 text-gray-600 transition-transform duration-200 ${
             profileMenuOpen ? 'rotate-180' : ''

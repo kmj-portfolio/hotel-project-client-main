@@ -449,7 +449,7 @@ const RoomCard = ({ room, onEdit, onDelete, onManagePhotos }: RoomCardProps) => 
 /* ── Main Page ─────────────────────────────────────────────── */
 
 const HotelManagePage = () => {
-  const { providerHotelId, setProviderHotelId } = useAuthStore();
+  const { providerHotelId, setProviderHotelId, setUserNickName } = useAuthStore();
 
   const [hotel, setHotel] = useState<HotelDetail | null>(null);
   const [rooms, setRooms] = useState<RoomInfo[]>([]);
@@ -500,6 +500,7 @@ const HotelManagePage = () => {
         if (providerHotelId) {
           const detail = await getProviderHotelDetail(providerHotelId);
           setHotel(detail);
+          setUserNickName(detail.name);
           await loadRooms(providerHotelId);
           return;
         }
@@ -514,6 +515,7 @@ const HotelManagePage = () => {
           setProviderHotelId(match.hotelId);
           const detail = await getProviderHotelDetail(match.hotelId);
           setHotel(detail);
+          setUserNickName(detail.name);
           await loadRooms(match.hotelId);
         }
       } catch {
@@ -565,6 +567,7 @@ const HotelManagePage = () => {
       }
       const detail = await getProviderHotelDetail(created.hotelId);
       setHotel(detail);
+      setUserNickName(detail.name);
       setSelectedPhoto(null);
       resetHotelForm();
     } catch (err) {
@@ -585,9 +588,11 @@ const HotelManagePage = () => {
         }
         const detail = await getProviderHotelDetail(hotel.hotelId);
         setHotel(detail);
+        setUserNickName(detail.name);
         setSelectedPhoto(null);
       } else {
         setHotel(updated);
+        setUserNickName(updated.name);
       }
       setIsEditing(false);
     } catch (err) {

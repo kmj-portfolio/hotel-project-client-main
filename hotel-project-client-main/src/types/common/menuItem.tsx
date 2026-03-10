@@ -27,6 +27,6 @@ export const providerMenuItems = [
 
 export const providerProfileMenuItems = [
   { label: '호텔 관리', href: '/mypage/hotel' },
-  { label: '개인 설정', href: '/mypage/settings' },
+  { label: '내 정보', href: '/mypage/settings' },
   { label: '고객센터', href: '/mypage/support' },
 ];
