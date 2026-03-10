@@ -2,7 +2,7 @@ import client from '@/service/instance/client';
 import handleApiReqeust from '../handleApiReqeust';
 
 import type { PaginationResult } from '@/types/pageable';
-import type { HotelItem } from '@/types/hotel';
+import type { HotelDetail, HotelItem } from '@/types/hotel';
 
 export const getHotels = async ({
   size,
@@ -17,7 +17,7 @@ export const getHotels = async ({
 };
 
 export const getHotelDetail = async (hotelId: number) => {
-  return (await client.get(`/api/hotels/${hotelId}`)).data;
+  return handleApiReqeust<HotelDetail>(() => client.get(`/api/hotels/${hotelId}`));
 };
 
 export interface HotelSearchBody {
