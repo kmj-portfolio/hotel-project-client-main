@@ -175,7 +175,7 @@ const BookingPage = () => {
   const myPrice =
     paymentMode === 'split' ? Math.ceil(totalPrice / participantCount) : totalPrice;
 
-  const openPortonePayment = async (reservationId: number, reservationNumber: string, amount: number) => {
+  const openPortonePayment = async (reservationId: number, _reservationNumber: string, amount: number) => {
     const storeId = import.meta.env.VITE_PORTONE_STORE_ID;
     const channelKey = import.meta.env.VITE_PORTONE_CHANNEL_KEY;
     if (!storeId || !channelKey) {

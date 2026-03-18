@@ -1,4 +1,4 @@
-import type { Reservation, ReservationDetail, ReservationResponse, ReservationStatus } from '@/types/ReservationType';
+import type { ReservationDetail, ReservationResponse, ReservationStatus } from '@/types/ReservationType';
 import client from '../instance/client';
 import handleApiReqeust from './handleApiReqeust';
 
