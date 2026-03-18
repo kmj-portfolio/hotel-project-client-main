@@ -11,13 +11,14 @@ import {
 import CommonInput from '../../common/input/CommonInput';
 import RHFInput from '../../common/input/RHFInput';
 import { PrimaryButton } from '@/component/common/button/PrimaryButton';
-import { formatBirthDate } from '@/utils/format/formatUtil';
+import { formatBirthDate, formatPhoneNumber } from '@/utils/format/formatUtil';
 import type { UserRole } from '@/types/user';
 
 const CustomerFields = [
   { name: 'name' as const, label: '이름', placeholder: '이름을 입력해주세요.' },
   { name: 'birthdate' as const, label: '생년월일', placeholder: 'YYYYMMDD' },
   { name: 'nickname' as const, label: '닉네임', placeholder: '사용할 닉네임을 입력해주세요.' },
+  { name: 'phoneNumber' as const, label: '전화번호', placeholder: '010-1234-5678' },
   { name: 'email' as const, label: '이메일', placeholder: '이메일을 입력해주세요' },
   { name: 'password' as const, label: '비밀번호', type: 'password', placeholder: '비밀번호를 입력해주세요' },
   { name: 'passwordConfirm' as const, label: '비밀번호 확인', type: 'password', placeholder: '비밀번호 확인' },
@@ -49,6 +50,7 @@ const GeneralRegisterForm = ({ role, onSubmit }: GeneralRegisterFormProps) => {
 
   // always call useController (hooks rule) but only render for customers
   const { field: birthField, fieldState } = useController({ name: 'birthdate', control });
+  const { field: phoneField, fieldState: phoneFieldState } = useController({ name: 'phoneNumber', control });
 
   const handleSubmitRegister = async (data: GeneralRegisterType) => {
     const error = await onSubmit(data);
@@ -76,6 +78,19 @@ const GeneralRegisterForm = ({ role, onSubmit }: GeneralRegisterFormProps) => {
                   onChange={(e) => birthField.onChange(formatBirthDate(e.target.value))}
                   error={!!fieldState.error}
                   errorMessage={fieldState.error?.message}
+                />
+              </div>
+            ) : field.name === 'phoneNumber' ? (
+              <div key="phoneNumber">
+                <CommonInput
+                  {...phoneField}
+                  value={phoneField.value ?? ''}
+                  label={field.label}
+                  maxLength={13}
+                  placeholder={field.placeholder}
+                  onChange={(e) => phoneField.onChange(formatPhoneNumber(e.target.value))}
+                  error={!!phoneFieldState.error}
+                  errorMessage={phoneFieldState.error?.message}
                 />
               </div>
             ) : (

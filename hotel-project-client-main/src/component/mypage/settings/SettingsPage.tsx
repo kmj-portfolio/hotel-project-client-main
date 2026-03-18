@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
 import { ChangePasswordSchema, type ChangePasswordType } from '@/schema/AuthSchema';
+import { formatPhoneNumber } from '@/utils/format/formatUtil';
 import {
   getCustomerDetails,
   getProviderProfile,
@@ -104,10 +105,18 @@ const SettingsPage = () => {
               <p className="text-gray-800">{provider?.hotelName || '-'}</p>
             </div>
           ) : (
-            <div>
-              <p className="mb-1 text-sm text-gray-500">닉네임</p>
-              <p className="text-gray-800">{customer?.nickname || '-'}</p>
-            </div>
+            <>
+              <div>
+                <p className="mb-1 text-sm text-gray-500">닉네임</p>
+                <p className="text-gray-800">{customer?.nickname || '-'}</p>
+              </div>
+              <div>
+                <p className="mb-1 text-sm text-gray-500">전화번호</p>
+                <p className="text-gray-800">
+                  {customer?.phoneNumber ? formatPhoneNumber(customer.phoneNumber) : '-'}
+                </p>
+              </div>
+            </>
           )}
         </div>
       </section>

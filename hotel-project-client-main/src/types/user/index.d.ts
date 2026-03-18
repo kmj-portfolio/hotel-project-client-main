@@ -10,6 +10,7 @@ export interface CustomerDetails {
   id: number;
   email: string;
   name: string;
+  phoneNumber: string;
   birthdate: string;
   nickname: string;
 }

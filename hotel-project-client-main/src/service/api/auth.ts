@@ -16,15 +16,21 @@ const getSignUpApiUrl = (role: UserRole) => {
 };
 
 export const GeneralSignup = async (role: UserRole, data: GeneralRegisterType | ProviderRegisterType) => {
-  const response = await handleApiReqeust<UserInfo>(() => client.post(getSignUpApiUrl(role), data));
+  const payload = 'phoneNumber' in data && data.phoneNumber
+    ? { ...data, phoneNumber: data.phoneNumber.replace(/-/g, '') }
+    : data;
+  const response = await handleApiReqeust<UserInfo>(() => client.post(getSignUpApiUrl(role), payload));
 
   return response;
 };
 
 export const SocialSignup = async (data: SocialRegisterType, accountType: string) => {
   //FIXME: 서버의 getGoolgleProfile에서 유저 정보 가져오면 수정되어야함.
+  const phoneNumber = 'phoneNumber' in data && data.phoneNumber
+    ? data.phoneNumber.replace(/-/g, '')
+    : undefined;
   const response = await handleApiReqeust<UserInfo>(() =>
-    client.post('/api/customers/oauth/signup', { ...data, accountType: accountType }),
+    client.post('/api/customers/oauth/signup', { ...data, phoneNumber, accountType }),
   );
 
   return response;

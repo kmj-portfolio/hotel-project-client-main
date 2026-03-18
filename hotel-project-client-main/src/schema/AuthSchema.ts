@@ -1,8 +1,9 @@
 import { z } from 'zod';
 
 const birthdateRegex = /^(19|20)\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
+const phoneRegex = /^01[0-9]-\d{3,4}-\d{4}$/;
 
-const RequiredValues = ['email', 'name', 'nickname', 'birthdate'] as const;
+const RequiredValues = ['email', 'name', 'nickname', 'birthdate', 'phoneNumber'] as const;
 
 export const LoginSchema = z.object({
   email: z.string().email({ message: '잘못된 이메일 형식입니다.' }),
@@ -19,11 +20,14 @@ const RegisterBaseSchema = z.object({
 
   nickname: z
     .string({ message: '닉네임은 필수 입력입니다.' })
-    .min(3, { message: '닉네임은 세글자 이상이어야합니다.' })
-    .max(16, { message: '닉네임은 최대 16글자 입니다.' }),
+    .min(2, { message: '닉네임은 두글자 이상이어야합니다.' })
+    .max(20, { message: '닉네임은 최대 20글자 입니다.' }),
   birthdate: z
     .string({ message: '생년월일은 필수 입력입니다.' })
     .regex(birthdateRegex, '올바른 형식이 아닙니다.'),
+  phoneNumber: z
+    .string({ message: '전화번호는 필수 입력입니다.' })
+    .regex(phoneRegex, '올바른 전화번호 형식이 아닙니다. (예: 010-1234-5678)'),
 });
 
 // oAuth
