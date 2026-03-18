@@ -1,7 +1,7 @@
-export type PaymentStatus = 'PAID' | 'FAILED' | 'CANCELLED';
+export type PaymentStatus = 'READY' | 'PAID' | 'FAILED' | 'CANCELLED';
 
 export interface PaymentResponse {
-  portOnePaymentId: string;
+  paymentId: string;
   paymentAmount: number;
   payMethod: string;
   cardPublisher?: string;
@@ -23,12 +23,12 @@ export interface PaymentListResponse {
   empty: boolean;
 }
 
-export interface CreatePaymentRequest {
-  portOnePaymentId: string;
+export interface VerifyPaymentRequest {
+  paymentId: string;
   reservationId: number;
 }
 
 export interface CancelPaymentRequest {
-  portOnePaymentId: string;
+  paymentId: string;
   reason: string;
 }
