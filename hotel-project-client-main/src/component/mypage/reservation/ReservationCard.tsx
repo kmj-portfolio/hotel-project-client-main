@@ -1,4 +1,5 @@
-import { memo, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import * as PortOne from '@portone/browser-sdk/v2';
 import { Calendar, Hotel, MapPin, Users } from 'lucide-react';
 import Card from '@/component/common/card/Card';
@@ -9,8 +10,9 @@ import type {
   ReservationStatus,
 } from '@/types/ReservationType';
 import { formatNumberToWon } from '@/utils/format/formatUtil';
-import { verifyPayment } from '@/service/api/payment';
-import { confirmReservation } from '@/service/api/reservation';
+import { createPayment, verifyPayment } from '@/service/api/payment';
+import { getCustomerDetails } from '@/service/api/auth';
+import type { CustomerDetails } from '@/types/user';
 
 
 const BookingStatus = memo(({ status }: BookingStatusProps) => {
@@ -42,8 +44,16 @@ const HotelImage = memo(({ image, hotelName }: HotelImageProps) => (
 HotelImage.displayName = 'HotelImage';
 
 const ReservationCard = memo(({ booking, onPaymentComplete }: ReservationCardProps) => {
+  const navigate = useNavigate();
   const [paying, setPaying] = useState(false);
   const [payError, setPayError] = useState<string>();
+  const [customer, setCustomer] = useState<CustomerDetails>();
+
+  useEffect(() => {
+    if (booking.reservationStatus === 'WAITING_PAYMENT') {
+      getCustomerDetails().then(setCustomer).catch(() => {});
+    }
+  }, [booking.reservationStatus]);
 
   const myAmount = Math.ceil(booking.totalPrice / (booking.numberOfParticipants || 1));
 
@@ -59,35 +69,44 @@ const ReservationCard = memo(({ booking, onPaymentComplete }: ReservationCardPro
     }
 
     setPaying(true);
-    const paymentId = `payment-${booking.reservationNumber}-${Date.now()}`;
-    const response = await PortOne.requestPayment({
-      storeId,
-      channelKey,
-      paymentId,
-      orderName: booking.hotelName,
-      totalAmount: myAmount,
-      currency: 'KRW',
-      payMethod: 'CARD',
-    });
-
-    if (response?.code !== undefined) {
-      setPayError(response.message ?? '결제에 실패했습니다.');
-      setPaying(false);
-      return;
-    }
-
     try {
-      await verifyPayment({ paymentId, amount: myAmount, reservationId: booking.reservationId });
-      await confirmReservation(booking.reservationId);
+      const payment = await createPayment(booking.reservationId);
+      const paymentId = payment.paymentId;
+
+      const response = await PortOne.requestPayment({
+        storeId,
+        channelKey,
+        paymentId,
+        orderName: booking.hotelName,
+        totalAmount: myAmount,
+        currency: 'KRW',
+        payMethod: 'CARD',
+        customer: {
+          fullName: customer?.name,
+          email: customer?.email,
+          phoneNumber: customer?.phoneNumber,
+        },
+      });
+
+      if (response?.code !== undefined) {
+        setPayError(response.message ?? '결제에 실패했습니다.');
+        return;
+      }
+
+      await verifyPayment({ paymentId, reservationId: booking.reservationId });
       onPaymentComplete?.();
     } catch (err) {
       setPayError(String(err));
+    } finally {
+      setPaying(false);
     }
-    setPaying(false);
   };
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
+    <div
+      className="cursor-pointer rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md"
+      onClick={() => navigate(`/mypage/bookings/${booking.reservationId}`)}
+    >
       <Card className="p-6">
         <Card.Header className="mb-4 flex items-start justify-between">
           <div className="flex items-center space-x-3">
@@ -131,8 +150,8 @@ const ReservationCard = memo(({ booking, onPaymentComplete }: ReservationCardPro
           </div>
 
           {booking.reservationStatus === 'WAITING_PAYMENT' && (
-            <div className="mt-4 border-t border-gray-100 pt-4">
-              {payError && <p className="mb-2 text-sm text-red-500">{payError}</p>}
+            <div className="mt-4 border-t border-gray-100 pt-4 space-y-3">
+              {payError && <p className="text-sm text-red-500">{payError}</p>}
               <button
                 onClick={handlePayNow}
                 disabled={paying}

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import TabNavigation from '@/component/common/Tab/TabNavigation';
 import ReservationCard from '@/component/mypage/reservation/ReservationCard';
-import { getReservationInfo } from '@/service/api/reservation';
+import { getReservationInfo, getAllReservations } from '@/service/api/reservation';
 import { useReservationStore } from '@/stores/useReservationStore';
 import type { ReservationStatus } from '@/types/ReservationType';
 
@@ -23,7 +23,8 @@ const ReservationPage = () => {
 
   const fetchData = useCallback(async () => {
     const status = TAB_STATUS_MAP[activeTab];
-    const response = await getReservationInfo({ status });
+    const response =
+      status === undefined ? await getAllReservations() : await getReservationInfo({ status });
     setReservations(response);
   }, [activeTab, setReservations]);
 

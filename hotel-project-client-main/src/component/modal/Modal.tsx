@@ -7,9 +7,10 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   full?: boolean;
+  className?: string;
 }
 
-const Modal = ({ isOpen, onClose, children, full = false }: ModalProps) => {
+const Modal = ({ isOpen, onClose, children, full = false, className = '' }: ModalProps) => {
   const modalRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -53,7 +54,7 @@ const Modal = ({ isOpen, onClose, children, full = false }: ModalProps) => {
       onClose={() => onClose()}
     >
       <div
-        className={`relative w-full bg-white p-5 md:max-w-[500px] ${full ? 'h-svh md:h-auto md:rounded-2xl' : 'rounded-2xl'}`}
+        className={`relative w-full bg-white p-5 md:max-w-[500px] ${full ? 'h-svh md:h-auto md:rounded-2xl' : 'rounded-2xl'} ${className}`}
       >
         {children}
       </div>

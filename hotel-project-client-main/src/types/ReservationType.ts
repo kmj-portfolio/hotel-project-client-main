@@ -5,6 +5,38 @@ export type ReservationStatus =
   | 'EXPIRED'
   | 'COMPLETE';
 
+export interface ParticipantDetail {
+  email: string;
+  name: string;
+  splitAmount: number;
+  paymentStatus: string;
+}
+
+export interface ReservedRoomDetail {
+  roomId: number;
+  roomType: string;
+  quantity: number;
+  pricePerNight: number;
+  nights: number;
+  subTotal: number;
+}
+
+export interface ReservationDetail {
+  reservationId: number;
+  reservationNumber: string;
+  reservationStatus: ReservationStatus;
+  nights: number;
+  checkIn: string;
+  checkOut: string;
+  participants: ParticipantDetail[];
+  rooms: ReservedRoomDetail[];
+  totalPrice: number;
+  pricePaid: number;
+  hotelName: string;
+  hotelAddress: string;
+  hotelMainImageUrl: string;
+}
+
 // =========================================
 // API Response 인터페이스 (ReservationListResponse)
 // =========================================

@@ -5,7 +5,7 @@ import { SocialRegisterSchema, type SocialRegisterType } from '@/schema/AuthSche
 
 import CommonInput from '../../common/input/CommonInput';
 import RHFInput from '../../common/input/RHFInput';
-import { formatBirthDate } from '@/utils/format/formatUtil';
+import { formatBirthDate, formatPhoneNumber } from '@/utils/format/formatUtil';
 
 const SocialRegisterFields = [
   {
@@ -22,6 +22,11 @@ const SocialRegisterFields = [
     name: 'nickname' as const,
     label: '닉네임',
     placeholder: '사용할 닉네임을 입력해주세요.',
+  },
+  {
+    name: 'phoneNumber' as const,
+    label: '전화번호',
+    placeholder: '010-1234-5678',
   },
   {
     name: 'email' as const,
@@ -47,6 +52,7 @@ const SocialRegisterForm = ({ onSubmit, defaultValues }: SocialRegisterFormProps
   });
 
   const { field: birthField, fieldState } = useController({ name: 'birthdate', control });
+  const { field: phoneField, fieldState: phoneFieldState } = useController({ name: 'phoneNumber', control });
 
   const handleSubmitRegister = async (data: SocialRegisterType) => {
     const error = await onSubmit(data);
@@ -84,6 +90,19 @@ const SocialRegisterForm = ({ onSubmit, defaultValues }: SocialRegisterFormProps
                 </div>
               );
             })()
+          ) : field.name === 'phoneNumber' ? (
+            <div key="phoneNumber">
+              <CommonInput
+                {...phoneField}
+                value={phoneField.value ?? ''}
+                label={field.label}
+                maxLength={13}
+                placeholder={field.placeholder}
+                onChange={(e) => phoneField.onChange(formatPhoneNumber(e.target.value))}
+                error={!!phoneFieldState.error}
+                errorMessage={phoneFieldState.error?.message}
+              />
+            </div>
           ) : (
             <div key={field.name}>
               <RHFInput

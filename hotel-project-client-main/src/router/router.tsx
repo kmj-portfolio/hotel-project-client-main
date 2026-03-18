@@ -14,6 +14,7 @@ import MyPage from '@/pages/MyPage';
 import ErrorPage from '@/pages/ErrorPage';
 import ProtectedRoute from './ProtectedRouter';
 import ReservationPage from '@/component/mypage/reservation/ReservationPage';
+import ReservationDetailPage from '@/component/mypage/reservation/ReservationDetailPage';
 import SettingsPage from '@/component/mypage/settings/SettingsPage';
 import SupportPage from '@/component/mypage/support/SupportPage';
 import LikePage from '@/component/mypage/like/LikePage';
@@ -91,6 +92,14 @@ export const router = createBrowserRouter([
             element: (
               <ProtectedRoute>
                 <ReservationPage />
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: 'bookings/:reservationId',
+            element: (
+              <ProtectedRoute>
+                <ReservationDetailPage />
               </ProtectedRoute>
             ),
           },
