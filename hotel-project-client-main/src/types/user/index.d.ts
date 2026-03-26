@@ -30,7 +30,8 @@ export interface LoginResponse {
 
 export interface ProviderProfile {
   email: string;
-  hotelName: string;
+  hotelName: string | null;
+  hotelId: number | null;
 }
 
 export interface WarnResponse {

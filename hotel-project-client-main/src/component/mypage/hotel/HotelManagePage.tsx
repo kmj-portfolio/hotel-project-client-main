@@ -20,7 +20,6 @@ import {
   uploadRoomPhotos,
   deletePhoto,
 } from '@/service/api/hotelManage';
-import { getAllHotels } from '@/service/api/hotel';
 import useAuthStore from '@/stores/useAuthStore';
 import { PrimaryButton } from '@/component/common/button/PrimaryButton';
 import RHFInput from '@/component/common/input/RHFInput';
@@ -506,18 +505,13 @@ const HotelManagePage = () => {
         }
 
         const profile = await getProviderProfile();
-        if (!profile.hotelName) return;
+        if (!profile.hotelId) return;
 
-        const query = new URLSearchParams({ keyword: profile.hotelName, page: '0', size: '5' }).toString();
-        const results = await getAllHotels(query);
-        const match = results.content.find((h) => h.name === profile.hotelName);
-        if (match) {
-          setProviderHotelId(match.hotelId);
-          const detail = await getProviderHotelDetail(match.hotelId);
-          setHotel(detail);
-          setUserNickName(detail.name);
-          await loadRooms(match.hotelId);
-        }
+        setProviderHotelId(profile.hotelId);
+        const detail = await getProviderHotelDetail(profile.hotelId);
+        setHotel(detail);
+        setUserNickName(detail.name);
+        await loadRooms(profile.hotelId);
       } catch {
         setError('호텔 정보를 불러오지 못했습니다.');
       } finally {
