@@ -150,25 +150,64 @@ const HotelPhotoInput = ({ currentPhotoUrl, onChange }: HotelPhotoInputProps) =>
 
 /* ── Sub-component: Room Form ──────────────────────────────── */
 
-interface RoomFormProps {
-  defaultValues?: Partial<RoomFormData>;
-  onSubmit: (data: RoomFormData) => Promise<void>;
-  onCancel: () => void;
-  submitLabel: string;
+interface RoomPhotos {
+  main: File | null;
+  additional: File[];
 }
 
-const RoomForm = ({ defaultValues, onSubmit, onCancel, submitLabel }: RoomFormProps) => {
+interface RoomFormProps {
+  defaultValues?: Partial<RoomFormData>;
+  onSubmit: (data: RoomFormData, photos: RoomPhotos) => Promise<void>;
+  onCancel: () => void;
+  submitLabel: string;
+  showPhotoUpload?: boolean;
+}
+
+const RoomForm = ({ defaultValues, onSubmit, onCancel, submitLabel, showPhotoUpload }: RoomFormProps) => {
   const { control, handleSubmit, formState } = useForm<RoomFormData>({
     resolver: zodResolver(RoomSchema),
     defaultValues,
     mode: 'onSubmit',
   });
   const [submitting, setSubmitting] = useState(false);
+  const [mainPhoto, setMainPhoto] = useState<File | null>(null);
+  const [mainPreview, setMainPreview] = useState<string | null>(null);
+  const [additionalPhotos, setAdditionalPhotos] = useState<File[]>([]);
+  const [additionalPreviews, setAdditionalPreviews] = useState<string[]>([]);
+  const mainInputRef = useRef<HTMLInputElement>(null);
+  const additionalInputRef = useRef<HTMLInputElement>(null);
+
+  const handleMainChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] ?? null;
+    if (mainPreview) URL.revokeObjectURL(mainPreview);
+    if (file) {
+      setMainPhoto(file);
+      setMainPreview(URL.createObjectURL(file));
+    } else {
+      setMainPhoto(null);
+      setMainPreview(null);
+    }
+  };
+
+  const handleAdditionalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    if (!files.length) return;
+    const previews = files.map((f) => URL.createObjectURL(f));
+    setAdditionalPhotos((prev) => [...prev, ...files]);
+    setAdditionalPreviews((prev) => [...prev, ...previews]);
+    if (additionalInputRef.current) additionalInputRef.current.value = '';
+  };
+
+  const removeAdditional = (idx: number) => {
+    URL.revokeObjectURL(additionalPreviews[idx]);
+    setAdditionalPhotos((prev) => prev.filter((_, i) => i !== idx));
+    setAdditionalPreviews((prev) => prev.filter((_, i) => i !== idx));
+  };
 
   const handleFormSubmit = async (data: RoomFormData) => {
     setSubmitting(true);
     try {
-      await onSubmit(data);
+      await onSubmit(data, { main: mainPhoto, additional: additionalPhotos });
     } finally {
       setSubmitting(false);
     }
@@ -179,6 +218,67 @@ const RoomForm = ({ defaultValues, onSubmit, onCancel, submitLabel }: RoomFormPr
       {formState.errors.root?.message && (
         <p className="text-sm text-red-500">{formState.errors.root.message}</p>
       )}
+
+      {showPhotoUpload && (
+        <div className="space-y-3">
+          {/* Main photo */}
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-gray-700">대표 사진</label>
+            <button
+              type="button"
+              onClick={() => mainInputRef.current?.click()}
+              className="relative flex h-36 w-full items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 hover:border-blue-300 hover:bg-blue-50 transition-colors"
+            >
+              {mainPreview ? (
+                <img src={mainPreview} alt="대표 사진 미리보기" className="h-full w-full object-cover" />
+              ) : (
+                <div className="flex flex-col items-center gap-2 text-gray-400">
+                  <Camera className="h-7 w-7" />
+                  <span className="text-sm">클릭하여 대표 사진 업로드</span>
+                </div>
+              )}
+              {mainPreview && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 hover:opacity-100 transition-opacity">
+                  <Camera className="h-6 w-6 text-white" />
+                  <span className="ml-2 text-sm font-medium text-white">사진 변경</span>
+                </div>
+              )}
+            </button>
+            <input ref={mainInputRef} type="file" accept="image/*" className="hidden" onChange={handleMainChange} />
+          </div>
+
+          {/* Additional photos */}
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-gray-700">추가 사진</label>
+            {additionalPreviews.length > 0 && (
+              <div className="mb-2 grid grid-cols-4 gap-2">
+                {additionalPreviews.map((url, idx) => (
+                  <div key={url} className="relative overflow-hidden rounded-lg">
+                    <img src={url} alt={`추가 사진 ${idx + 1}`} className="h-20 w-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => removeAdditional(idx)}
+                      className="absolute right-0.5 top-0.5 rounded-full bg-red-500 p-0.5 text-white hover:bg-red-600"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={() => additionalInputRef.current?.click()}
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 py-2 text-sm text-gray-500 hover:bg-gray-50"
+            >
+              <Plus className="h-4 w-4" />
+              추가 사진 업로드
+            </button>
+            <input ref={additionalInputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleAdditionalChange} />
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-2 gap-3">
         <RHFInput name="roomType" label="객실 유형" placeholder="디럭스, 스위트 등" control={control} />
         <RHFInput name="price" label="1박 가격 (원)" type="number" placeholder="100000" control={control} />
@@ -186,6 +286,7 @@ const RoomForm = ({ defaultValues, onSubmit, onCancel, submitLabel }: RoomFormPr
         <RHFInput name="totalQuantity" label="객실 수량" type="number" placeholder="5" control={control} />
       </div>
       <RHFInput name="description" label="설명" placeholder="객실 설명을 입력해주세요" control={control} />
+
       <div className="flex gap-2">
         <PrimaryButton size="sm" disabled={submitting}>
           {submitLabel}
@@ -621,7 +722,7 @@ const HotelManagePage = () => {
 
   /* ── Room CRUD ────────────────────────────────────────────── */
 
-  const onAddRoom = async (data: RoomFormData) => {
+  const onAddRoom = async (data: RoomFormData, photos: RoomPhotos) => {
     const created = await createRoom({
       description: data.description,
       roomType: data.roomType,
@@ -629,11 +730,36 @@ const HotelManagePage = () => {
       occupancy: data.occupancy,
       totalQuantity: data.totalQuantity,
     });
-    setRooms((prev) => [...prev, created]);
+    let updatedRoom = created;
+    if (photos.main || photos.additional.length > 0) {
+      try {
+        const files: File[] = [];
+        const displayTypes: ('MAIN' | 'ADDITIONAL')[] = [];
+        if (photos.main) {
+          files.push(photos.main);
+          displayTypes.push('MAIN');
+        }
+        photos.additional.forEach((f) => {
+          files.push(f);
+          displayTypes.push('ADDITIONAL');
+        });
+        const results = await uploadRoomPhotos(created.roomId, files, displayTypes);
+        const mainResult = results.find((r) => r.displayType === 'MAIN');
+        const additionalResults = results.filter((r) => r.displayType === 'ADDITIONAL');
+        updatedRoom = {
+          ...created,
+          ...(mainResult ? { mainImageUrl: mainResult.photoUrl } : {}),
+          additionalPhotoUrls: additionalResults.map((r) => r.photoUrl),
+        };
+      } catch {
+        setActionError('객실은 등록되었으나 사진 업로드에 실패했습니다.');
+      }
+    }
+    setRooms((prev) => [...prev, updatedRoom]);
     setShowAddRoom(false);
   };
 
-  const onUpdateRoom = async (data: RoomFormData) => {
+  const onUpdateRoom = async (data: RoomFormData, _photos: RoomPhotos) => {
     if (!editingRoom) return;
     const updated = await updateRoom(editingRoom.roomId, {
       roomId: editingRoom.roomId,
@@ -892,6 +1018,7 @@ const HotelManagePage = () => {
               onSubmit={onAddRoom}
               onCancel={() => setShowAddRoom(false)}
               submitLabel="추가"
+              showPhotoUpload
             />
           </div>
         )}
