@@ -25,7 +25,6 @@ const CustomerFields = [
 ];
 
 const ProviderFields = [
-  { name: 'name' as const, label: '이름', placeholder: '이름을 입력해주세요.' },
   { name: 'email' as const, label: '이메일', placeholder: '이메일을 입력해주세요' },
   { name: 'password' as const, label: '비밀번호', type: 'password', placeholder: '비밀번호를 입력해주세요' },
   { name: 'passwordConfirm' as const, label: '비밀번호 확인', type: 'password', placeholder: '비밀번호 확인' },

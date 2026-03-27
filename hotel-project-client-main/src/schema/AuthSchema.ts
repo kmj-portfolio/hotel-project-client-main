@@ -80,7 +80,6 @@ export const ProviderRegisterSchema = z
     email: z
       .string({ message: '이메일은 필수 입력입니다.' })
       .email({ message: '잘못된 이메일 형식입니다.' }),
-    name: z.string({ message: '이름은 필수 입력입니다.' }),
     password: z
       .string({ message: '비밀번호는 필수 입력입니다.' })
       .min(10, { message: '비밀번호는 최소 10자 이상이어야 합니다.' }),
