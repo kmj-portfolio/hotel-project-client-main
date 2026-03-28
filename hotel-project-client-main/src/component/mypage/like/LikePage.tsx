@@ -30,9 +30,11 @@ interface SelectedList {
   isOwner: boolean;
 }
 
+const stripQuotes = (name: string) => name.replace(/^"|"$/g, '');
+
 const StarRating = ({ value }: { value: number }) => (
-  <span className="flex items-center gap-0.5 text-xs text-amber-500">
-    <Star className="h-3 w-3 fill-amber-400 stroke-amber-400" />
+  <span className="flex items-center gap-1 text-sm text-amber-500">
+    <Star className="h-4 w-4 fill-amber-400 stroke-amber-400" />
     {value.toFixed(1)}
   </span>
 );
@@ -371,7 +373,7 @@ const LikePage = () => {
                   ) : (
                     <div className="min-w-0 flex-1">
                       <span className="block truncate text-sm font-medium text-gray-800">
-                        {summary.listName}
+                        {stripQuotes(summary.listName)}
                       </span>
                       {!isOwner && (
                         <span className="text-xs text-gray-400">{summary.ownerNickname}</span>
@@ -430,7 +432,7 @@ const LikePage = () => {
               {/* Panel header */}
               <div className="mb-4 flex items-center justify-between">
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-800">{selectedList.name}</h2>
+                  <h2 className="text-lg font-semibold text-gray-800">{stripQuotes(selectedList.name)}</h2>
                   {detail && !selectedList.isOwner && (
                     <p className="text-xs text-gray-400">소유자: {detail.ownerNickname}</p>
                   )}
@@ -458,41 +460,41 @@ const LikePage = () => {
                       <p className="mt-1 text-sm">호텔 상세 페이지에서 좋아요 버튼을 눌러보세요!</p>
                     </div>
                   ) : (
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                       {detail.hotels.content.map((hotel: HotelInList) => (
                         <div
                           key={hotel.hotelId}
-                          className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-4"
+                          className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-5"
                         >
-                          <div className="flex min-w-0 items-center gap-3">
+                          <div className="flex min-w-0 items-center gap-5">
                             {hotel.mainImageUrl ? (
                               <img
                                 src={hotel.mainImageUrl}
                                 alt={hotel.name}
-                                className="h-14 w-14 flex-shrink-0 rounded-lg object-cover"
+                                className="h-40 w-40 flex-shrink-0 rounded-xl object-cover"
                               />
                             ) : (
-                              <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-lg bg-gray-100">
-                                <Hotel className="h-6 w-6 text-gray-400" />
+                              <div className="flex h-40 w-40 flex-shrink-0 items-center justify-center rounded-xl bg-gray-100">
+                                <Hotel className="h-10 w-10 text-gray-400" />
                               </div>
                             )}
-                            <div className="min-w-0">
+                            <div className="min-w-0 space-y-1">
                               <Link
                                 to={`/hotels/${hotel.hotelId}`}
-                                className="block truncate text-sm font-semibold text-blue-600 hover:underline"
+                                className="block truncate text-base font-semibold text-blue-600 hover:underline"
                               >
                                 {hotel.name}
                               </Link>
-                              <p className="truncate text-xs text-gray-400">{hotel.address}</p>
+                              <p className="truncate text-sm text-gray-500">{hotel.address}</p>
                               <StarRating value={hotel.rating} />
                             </div>
                           </div>
                           <button
                             onClick={() => handleRemoveHotel(hotel.hotelId)}
-                            className="ml-4 flex-shrink-0 rounded-lg p-1.5 text-gray-300 hover:bg-red-50 hover:text-red-500"
+                            className="ml-4 flex-shrink-0 rounded-lg p-2 text-gray-300 hover:bg-red-50 hover:text-red-500"
                             title="목록에서 제거"
                           >
-                            <X className="h-4 w-4" />
+                            <X className="h-5 w-5" />
                           </button>
                         </div>
                       ))}

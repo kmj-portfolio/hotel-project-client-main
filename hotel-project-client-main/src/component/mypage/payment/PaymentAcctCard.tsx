@@ -1,13 +1,11 @@
 import Card from '@/component/common/card/Card';
 interface FareItem {
-  payNo: number;
   payAcct: string;
   payDateTime: string;
   state: string;
 }
 
 const fareBreakdown: FareItem = {
-  payNo: 371194823,
   payAcct: '신한카드',
   payDateTime: '2025-08-02 00:37',
   state: '완료',
@@ -28,7 +26,7 @@ const PaymentAcctCard = () => {
             결제 일시 : {fareBreakdown.payDateTime}
           </div>
           <div className="text-ms font-medium text-gray-900">결제 상태 : {fareBreakdown.state}</div>
-          <div className="text-ms font-medium text-gray-900">결제 번호 : {fareBreakdown.payNo}</div>
+
         </div>
 
         <div className="mt-6 text-center text-xs font-bold text-red-500">

@@ -72,10 +72,6 @@ const PaymentDetailModal: React.FC<{
                 <span className="text-gray-600">예약 번호</span>
                 <span className="font-medium">{payment.reservationNumber}</span>
               </div>
-              <div className="flex justify-between text-base">
-                <span className="text-gray-600">결제 번호</span>
-                <span className="font-medium text-base break-all">{payment.paymentId}</span>
-              </div>
             </div>
           </div>
 
