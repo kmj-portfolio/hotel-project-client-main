@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import * as PortOne from '@portone/browser-sdk/v2';
 import { DayPicker } from 'react-day-picker';
-import type { DateRange } from 'react-day-picker';
 import 'react-day-picker/style.css';
 
 import { getCustomerDetails, getUsernameAutocomplete } from '@/service/api/auth';
@@ -60,7 +59,7 @@ const BookingPage = () => {
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
-  const [showCalendar, setShowCalendar] = useState(false);
+  const [calendarTarget, setCalendarTarget] = useState<'checkIn' | 'checkOut' | null>(null);
 
   useEffect(() => {
     getCustomerDetails()
@@ -82,7 +81,7 @@ const BookingPage = () => {
         setNoResults(false);
       }
       if (calendarRef.current && !calendarRef.current.contains(e.target as Node)) {
-        setShowCalendar(false);
+        setCalendarTarget(null);
       }
     };
     document.addEventListener('mousedown', handler);
@@ -427,8 +426,8 @@ const BookingPage = () => {
                 <p className="mb-1 text-sm text-gray-500">체크인</p>
                 <button
                   type="button"
-                  onClick={() => setShowCalendar((v) => !v)}
-                  className={`flex w-full items-center justify-between rounded-lg border px-3 py-2 text-sm ${checkIn ? 'text-gray-900' : 'text-gray-400'} ${showCalendar ? 'border-primary-500' : 'border-gray-200'} bg-white focus:outline-none`}
+                  onClick={() => setCalendarTarget((v) => (v === 'checkIn' ? null : 'checkIn'))}
+                  className={`flex w-full items-center justify-between rounded-lg border px-3 py-2 text-sm ${checkIn ? 'text-gray-900' : 'text-gray-400'} ${calendarTarget === 'checkIn' ? 'border-primary-500' : 'border-gray-200'} bg-white focus:outline-none`}
                 >
                   <span>{checkIn || '체크인 날짜 선택'}</span>
                   <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -440,8 +439,8 @@ const BookingPage = () => {
                 <p className="mb-1 text-sm text-gray-500">체크아웃</p>
                 <button
                   type="button"
-                  onClick={() => setShowCalendar((v) => !v)}
-                  className={`flex w-full items-center justify-between rounded-lg border px-3 py-2 text-sm ${checkOut ? 'text-gray-900' : 'text-gray-400'} ${showCalendar ? 'border-primary-500' : 'border-gray-200'} bg-white focus:outline-none`}
+                  onClick={() => setCalendarTarget((v) => (v === 'checkOut' ? null : 'checkOut'))}
+                  className={`flex w-full items-center justify-between rounded-lg border px-3 py-2 text-sm ${checkOut ? 'text-gray-900' : 'text-gray-400'} ${calendarTarget === 'checkOut' ? 'border-primary-500' : 'border-gray-200'} bg-white focus:outline-none`}
                 >
                   <span>{checkOut || '체크아웃 날짜 선택'}</span>
                   <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -451,32 +450,51 @@ const BookingPage = () => {
               </div>
             </div>
 
-            {showCalendar && (
+            {calendarTarget !== null && (
               <div className="absolute left-0 right-0 top-full z-20 mt-1 rounded-xl border border-gray-200 bg-white p-2 shadow-lg">
-                <DayPicker
-                  mode="range"
-                  defaultMonth={checkIn ? new Date(checkIn + 'T00:00:00') : new Date()}
-                  selected={{
-                    from: checkIn ? new Date(checkIn + 'T00:00:00') : undefined,
-                    to: checkOut ? new Date(checkOut + 'T00:00:00') : undefined,
-                  }}
-                  onSelect={(range: DateRange | undefined) => {
-                    const from = range?.from;
-                    const to = range?.to;
-                    setCheckIn(from ? formatDateToISOstring(from) : '');
-                    if (from && !to) {
-                      const nextDay = new Date(from);
-                      nextDay.setDate(nextDay.getDate() + 1);
-                      setCheckOut(formatDateToISOstring(nextDay));
-                      setShowCalendar(false);
-                    } else {
-                      setCheckOut(to ? formatDateToISOstring(to) : '');
-                      if (from && to) setShowCalendar(false);
+                {calendarTarget === 'checkIn' ? (
+                  <DayPicker
+                    mode="single"
+                    defaultMonth={checkIn ? new Date(checkIn + 'T00:00:00') : new Date()}
+                    selected={checkIn ? new Date(checkIn + 'T00:00:00') : undefined}
+                    onSelect={(day: Date | undefined) => {
+                      if (!day) return;
+                      const formatted = formatDateToISOstring(day);
+                      setCheckIn(formatted);
+                      if (checkOut && formatted >= checkOut) {
+                        const nextDay = new Date(day);
+                        nextDay.setDate(nextDay.getDate() + 1);
+                        setCheckOut(formatDateToISOstring(nextDay));
+                      }
+                      setCalendarTarget(null);
+                    }}
+                    disabled={{ before: new Date(today + 'T00:00:00') }}
+                    numberOfMonths={1}
+                  />
+                ) : (
+                  <DayPicker
+                    mode="single"
+                    defaultMonth={
+                      checkOut
+                        ? new Date(checkOut + 'T00:00:00')
+                        : checkIn
+                          ? new Date(checkIn + 'T00:00:00')
+                          : new Date()
                     }
-                  }}
-                  disabled={{ before: new Date(today + 'T00:00:00') }}
-                  numberOfMonths={1}
-                />
+                    selected={checkOut ? new Date(checkOut + 'T00:00:00') : undefined}
+                    onSelect={(day: Date | undefined) => {
+                      if (!day) return;
+                      setCheckOut(formatDateToISOstring(day));
+                      setCalendarTarget(null);
+                    }}
+                    disabled={{
+                      before: checkIn
+                        ? new Date(new Date(checkIn + 'T00:00:00').getTime() + 24 * 60 * 60 * 1000)
+                        : new Date(today + 'T00:00:00'),
+                    }}
+                    numberOfMonths={1}
+                  />
+                )}
               </div>
             )}
           </div>
