@@ -127,7 +127,11 @@ const PaymentPage: React.FC = () => {
     setError(undefined);
     try {
       const data = await getMyPayments(p, 10);
-      setPayments(data.content);
+      setPayments(
+        data.content
+          .filter((p) => p.status !== 'READY')
+          .sort((a, b) => (b.paidAt ?? '').localeCompare(a.paidAt ?? '')),
+      );
       setTotalPages(data.totalPages);
     } catch (err) {
       setError(String(err));
