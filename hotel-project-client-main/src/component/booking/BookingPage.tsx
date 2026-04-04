@@ -6,7 +6,7 @@ import 'react-day-picker/style.css';
 
 import { getCustomerDetails, getUsernameAutocomplete } from '@/service/api/auth';
 import { createReservation } from '@/service/api/reservation';
-import { createPayment, verifyPayment } from '@/service/api/payment';
+import { createPayment, subscribePaymentSse } from '@/service/api/payment';
 import { formatNumberWithComma, formatDateToISOstring, formatPhoneNumber } from '@/utils/format/formatUtil';
 
 import type { RoomInfo } from '@/types/room/room';
@@ -52,6 +52,7 @@ const BookingPage = () => {
   const [noResults, setNoResults] = useState(false);
   const [paymentMode, setPaymentMode] = useState<PaymentMode>('solo');
   const [submitting, setSubmitting] = useState(false);
+  const [processingPayment, setProcessingPayment] = useState(false);
   const [error, setError] = useState<string>();
   const [participantError, setParticipantError] = useState<string>();
   const [autocompleteError, setAutocompleteError] = useState<string>();
@@ -193,6 +194,10 @@ const BookingPage = () => {
       return;
     }
 
+    // Open SSE connection before PortOne so we don't miss the backend event
+    const abortController = new AbortController();
+    const ssePromise = subscribePaymentSse(paymentId, abortController.signal);
+
     const response = await PortOne.requestPayment({
       storeId,
       channelKey,
@@ -209,15 +214,18 @@ const BookingPage = () => {
     });
 
     if (response?.code !== undefined) {
+      abortController.abort();
       setError(response.message ?? '결제에 실패했습니다.');
       setSubmitting(false);
       return;
     }
 
+    setProcessingPayment(true);
     try {
-      await verifyPayment({ paymentId });
+      await ssePromise;
       navigate(`/mypage/bookings/${reservationId}`);
     } catch (err) {
+      setProcessingPayment(false);
       setError(String(err));
       setSubmitting(false);
     }
@@ -260,6 +268,17 @@ const BookingPage = () => {
       setSubmitting(false);
     }
   };
+
+  // ── Payment processing screen ──
+  if (processingPayment) {
+    return (
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 text-center">
+        <div className="flex h-16 w-16 animate-spin items-center justify-center rounded-full border-4 border-primary-200 border-t-primary-600" />
+        <h2 className="text-xl font-bold text-gray-800">결제 처리 중...</h2>
+        <p className="text-sm text-gray-500">잠시만 기다려 주세요. 결제 결과를 확인하고 있습니다.</p>
+      </div>
+    );
+  }
 
   // ── Split payment confirmation modal ──
   if (confirmation && paymentMode === 'split') {

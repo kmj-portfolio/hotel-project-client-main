@@ -10,7 +10,7 @@ import type {
   ReservationStatus,
 } from '@/types/ReservationType';
 import { formatNumberToWon } from '@/utils/format/formatUtil';
-import { createPayment, verifyPayment } from '@/service/api/payment';
+import { createPayment, subscribePaymentSse } from '@/service/api/payment';
 import { getCustomerDetails } from '@/service/api/auth';
 import { getReservationDetail } from '@/service/api/reservation';
 import { createReview } from '@/service/api/review';
@@ -65,6 +65,7 @@ const StarPicker = ({ value, onChange }: { value: number; onChange: (v: number) 
 const ReservationCard = memo(({ booking }: ReservationCardProps) => {
   const navigate = useNavigate();
   const [paying, setPaying] = useState(false);
+  const [processingPayment, setProcessingPayment] = useState(false);
   const [payError, setPayError] = useState<string>();
   const [customer, setCustomer] = useState<CustomerDetails>();
   const [myPaymentDone, setMyPaymentDone] = useState(false);
@@ -149,6 +150,10 @@ const ReservationCard = memo(({ booking }: ReservationCardProps) => {
       const payment = await createPayment(booking.reservationId);
       const paymentId = payment.paymentId;
 
+      // Open SSE connection before PortOne so we don't miss the backend event
+      const abortController = new AbortController();
+      const ssePromise = subscribePaymentSse(paymentId, abortController.signal);
+
       const response = await PortOne.requestPayment({
         storeId,
         channelKey,
@@ -165,13 +170,16 @@ const ReservationCard = memo(({ booking }: ReservationCardProps) => {
       });
 
       if (response?.code !== undefined) {
+        abortController.abort();
         setPayError(response.message ?? '결제에 실패했습니다.');
         return;
       }
 
-      await verifyPayment({ paymentId });
+      setProcessingPayment(true);
+      await ssePromise;
       navigate(`/mypage/bookings/${booking.reservationId}`);
     } catch (err) {
+      setProcessingPayment(false);
       setPayError(String(err));
     } finally {
       setPaying(false);
@@ -181,9 +189,15 @@ const ReservationCard = memo(({ booking }: ReservationCardProps) => {
   return (
     <>
       <div
-        className="cursor-pointer rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md"
+        className="relative cursor-pointer rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md"
         onClick={() => navigate(`/mypage/bookings/${booking.reservationId}`)}
       >
+        {processingPayment && (
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-lg bg-white/90">
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary-200 border-t-primary-600" />
+            <p className="text-sm font-semibold text-gray-700">결제 처리 중...</p>
+          </div>
+        )}
         <Card className="p-6">
           <Card.Header className="mb-4 flex items-start justify-between">
             <div className="flex items-center space-x-3">
