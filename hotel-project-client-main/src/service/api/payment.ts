@@ -49,7 +49,8 @@ export const subscribePaymentSse = (paymentId: string, signal: AbortSignal): Pro
         };
         if (token) headers['Authorization'] = `Bearer ${token}`;
 
-        const response = await fetch(`/api/payments/${paymentId}/stream`, { headers, signal });
+        const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
+        const response = await fetch(`${baseUrl}/api/payments/${paymentId}/stream`, { headers, signal });
 
         if (!response.ok || !response.body) {
           safeReject(new Error('SSE 연결에 실패했습니다.'));
